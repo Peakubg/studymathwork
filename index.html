@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;500;700&family=Fira+Code&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
         
         :root {
             --bg: #0a0e27; --bg2: #151b3d; --bg3: #1e2749;
@@ -19,46 +19,142 @@
             --shadow-md: 0 8px 32px rgba(0,0,0,0.4);
         }
         
+        /* ═══ LOADING SCREEN ═══ */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+        
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .loading-logo {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            margin-bottom: 40px;
+        }
+        
+        .loading-logo svg {
+            width: 100%;
+            height: 100%;
+            animation: pulse 2s infinite ease-in-out;
+            filter: drop-shadow(0 0 30px rgba(0,212,255,0.5));
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.05) rotate(5deg); opacity: 0.8; }
+        }
+        
+        .loading-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--acc);
+            text-shadow: 0 0 30px var(--glow);
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .loading-text::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--acc), transparent);
+            animation: scan 2s infinite linear;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .loading-bar {
+            width: 400px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 30px;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--acc), #00a8ff);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .loading-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .loading-stats {
+            margin-top: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            color: var(--txt2);
+            text-align: center;
+        }
+        
         /* ═══ THEME PRESETS ═══ */
         body.theme-midnight { 
             --bg: #0a0e27; --bg2: #151b3d; --bg3: #1e2749;
             --acc: #00d4ff; --glow: rgba(0,212,255,0.2);
-            --acc-light: #6fe7ff; --acc-dark: #0099cc;
         }
         body.theme-neon { 
             --bg: #000814; --bg2: #001233; --bg3: #001845;
             --acc: #ff00ff; --glow: rgba(255,0,255,0.2);
-            --acc-light: #ff66ff; --acc-dark: #cc00cc;
         }
         body.theme-aurora { 
             --bg: #0a1a2d; --bg2: #152a4d; --bg3: #1f3a6d;
             --acc: #00ffaa; --glow: rgba(0,255,170,0.2);
-            --acc-light: #66ffcc; --acc-dark: #00cc88;
         }
         body.theme-sunset { 
             --bg: #1a0e1a; --bg2: #2d1830; --bg3: #3d2340;
             --acc: #ff6b35; --glow: rgba(255,107,53,0.2);
-            --acc-light: #ff9d7a; --acc-dark: #cc5220;
         }
         body.theme-cyber { 
             --bg: #0d0d1a; --bg2: #1a1a33; --bg3: #27274d;
             --acc: #00ffff; --glow: rgba(0,255,255,0.2);
-            --acc-light: #66ffff; --acc-dark: #00cccc;
         }
         body.theme-matrix { 
             --bg: #000f00; --bg2: #001a00; --bg3: #002500;
             --acc: #00ff00; --glow: rgba(0,255,0,0.2);
-            --acc-light: #66ff66; --acc-dark: #00cc00;
         }
         body.theme-space { 
             --bg: #000016; --bg2: #01012e; --bg3: #020246;
             --acc: #9370ff; --glow: rgba(147,112,255,0.2);
-            --acc-light: #b39bff; --acc-dark: #6a4fcc;
-        }
-        body.theme-fire { 
-            --bg: #1a0500; --bg2: #330a00; --bg3: #4d0f00;
-            --acc: #ff3300; --glow: rgba(255,51,0,0.2);
-            --acc-light: #ff7a66; --acc-dark: #cc2900;
         }
         
         body.high-contrast { 
@@ -70,54 +166,214 @@
         body.performance-mode #desktop-bg { display: none; }
         body.font-large { font-size: 18px; }
         body.no-cursor { cursor: default; }
-        body.no-cursor #cursor { display: none; }
+        body.no-cursor #cursor { display: none !important; }
         
         html, body { width: 100%; height: 100%; font-family: 'Inter', 'Roboto', sans-serif; overflow: hidden; }
-        body { background: var(--bg); color: var(--txt); transition: background-color 0.3s; }
+        body { background: var(--bg); color: var(--txt); transition: background-color 0.3s; cursor: none; }
         body.unlocked { cursor: none; }
         
         /* ═══ CUSTOM CURSOR ═══ */
         #cursor { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 999999;
-            transform: translate(-8px, -8px); display: none; mix-blend-mode: difference; }
+            transform: translate(-8px, -8px); display: none; }
         body.unlocked #cursor { display: block; }
         .c-pointer { width: 16px; height: 24px; position: relative; }
         .c-pointer::before { content: ''; position: absolute; top: 0; left: 0; width: 0; height: 0;
             border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 12px solid var(--acc);
             transform: rotate(-45deg); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
         .c-pointer::after { content: ''; position: absolute; top: 0; left: 0; width: 0; height: 0;
-            border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid var(--acc-light);
+            border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid rgba(255,255,255,0.8);
             transform: rotate(-45deg) translate(2px, 2px); }
         #cursor.hover .c-pointer::before { transform: rotate(-45deg) scale(1.2); }
-        #cursor.click .c-pointer::before { transform: rotate(-45deg) scale(0.9); }
+        #cursor.click .c-pointer::before { transform: rotate(-45deg) scale(0.8) translateY(2px); }
+        
+        /* Cursor states for dragging and resizing */
+        body.resizing #cursor .c-pointer::before,
+        body.dragging #cursor .c-pointer::before {
+            transform: rotate(-45deg) scale(0.8);
+        }
+        body.resizing-ns #cursor .c-pointer::before,
+        body.resizing-ew #cursor .c-pointer::before {
+            transform: none !important;
+            border: none;
+            width: 8px;
+            height: 8px;
+            background: var(--acc);
+            border-radius: 50%;
+        }
         
         /* ═══ BACKGROUND SYSTEM ═══ */
         #desktop-bg { position: fixed; inset: 0; z-index: 0; transition: background .5s ease; }
-        #desktop-bg.bg-gradient-1 { background: linear-gradient(135deg, var(--bg) 0%, var(--bg3) 100%); }
-        #desktop-bg.bg-gradient-2 { background: linear-gradient(135deg, #0a0e27 0%, #1e2749 50%, #00d4ff22 100%); }
-        #desktop-bg.bg-gradient-3 { background: linear-gradient(135deg, #1a0e0a 0%, #3d2318 100%); }
-        #desktop-bg.bg-gradient-4 { background: linear-gradient(135deg, #0a1a0e 0%, #1e3d27 100%); }
-        #desktop-bg.bg-stars { background: #000 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><circle cx="50" cy="80" r="1.5" fill="white" opacity="0.9"/><circle cx="350" cy="150" r="1" fill="white" opacity="0.7"/><circle cx="200" cy="250" r="2" fill="white" opacity="0.8"/><circle cx="100" cy="350" r="1" fill="white" opacity="0.6"/><circle cx="300" cy="50" r="1.5" fill="white" opacity="0.9"/></svg>'); }
-        #desktop-bg.bg-grid { background: linear-gradient(var(--border) 1px, transparent 1px),
-            linear-gradient(90deg, var(--border) 1px, transparent 1px);
-            background-size: 40px 40px; }
-        #desktop-bg.bg-waves { background: 
-            radial-gradient(circle at 20% 80%, rgba(0,212,255,0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(168,85,247,0.1) 0%, transparent 50%),
-            var(--bg); }
-        #desktop-bg.bg-custom { background-size: cover; background-position: center; }
+        #desktop-bg.bg-gradient-1 { background: linear-gradient(135deg, #0a0e27 0%, #1e2749 100%); }
+        #desktop-bg.bg-gradient-2 { background: linear-gradient(135deg, #1a0e0a 0%, #3d2318 100%); }
+        #desktop-bg.bg-gradient-3 { background: linear-gradient(135deg, #0a1a0e 0%, #1e3d27 100%); }
+        #desktop-bg.bg-gradient-4 { background: linear-gradient(135deg, #140a1a 0%, #351e3d 100%); }
+        #desktop-bg.bg-stars { 
+            background: #000;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+        }
+        #desktop-bg.bg-grid { 
+            background: 
+                linear-gradient(90deg, var(--border) 1px, transparent 1px),
+                linear-gradient(var(--border) 1px, transparent 1px);
+            background-size: 40px 40px; 
+        }
+        #desktop-bg.bg-waves { 
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0,212,255,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(168,85,247,0.15) 0%, transparent 50%),
+                var(--bg); 
+        }
+        #desktop-bg.bg-custom { background-size: cover; background-position: center; background-repeat: no-repeat; }
         
         .bg-logo-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            opacity: 0.04; pointer-events: none; text-align: center; }
-        .bg-logo-watermark svg { width: 500px; height: 500px; filter: drop-shadow(0 0 20px rgba(0,212,255,0.3)); }
-        .bg-logo-watermark .logo-text { font-family: 'Orbitron', sans-serif; font-size: 48px; font-weight: 900;
-            color: var(--acc); text-shadow: 0 0 30px var(--glow); margin-top: -40px; letter-spacing: 8px; }
+            opacity: 0.25; pointer-events: none; text-align: center; z-index: 1; }
+        .bg-logo-watermark svg { width: 600px; height: 600px; filter: drop-shadow(0 0 40px rgba(0,212,255,0.7)); }
+        .bg-logo-watermark .logo-text { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 90px; 
+            font-weight: 900;
+            color: var(--acc); 
+            text-shadow: 0 0 60px var(--glow), 0 0 120px var(--glow), 0 0 200px var(--glow);
+            margin-top: 20px; 
+            letter-spacing: 15px;
+            opacity: 0.9;
+        }
         
         /* ═══ DISGUISE ═══ */
-        #disguise { position: fixed; inset: 0; z-index: 99999; background: #f5f7fa; 
-            overflow-y: auto; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-            transition: opacity .5s, transform .5s; cursor: default; }
+        #disguise { position: fixed; inset: 0; z-index: 99999; background: #f0f2f5; 
+            overflow-y: auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            transition: opacity .5s, transform .5s; cursor: default !important; } /* FIXED: Added cursor:default */
         #disguise.hide { opacity: 0; transform: scale(1.02); pointer-events: none; }
         body.unlocked #disguise { display: none; }
+        
+        /* FIXED: Show normal cursor in disguise */
+        #disguise * {
+            cursor: default !important;
+        }
+        
+        .edu-wrap { max-width: 1200px; margin: 0 auto; padding: 40px 20px; min-height: 100vh; }
+        .edu-header { 
+            background: linear-gradient(135deg, #1a237e, #283593);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+        }
+        .edu-logo { 
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #ffffff, #e3f2fd);
+            color: #1a237e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 800;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            border: 3px solid white;
+        }
+        .edu-brand h1 { 
+            font-size: 36px;
+            color: #ffffff;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .edu-brand p { 
+            color: rgba(255,255,255,0.9);
+            font-size: 16px;
+            font-weight: 400;
+        }
+        
+        .edu-hero { 
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            border: 1px solid #e0e0e0;
+        }
+        .edu-hero-content { 
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        .edu-hero-text h2 { 
+            color: #1a237e;
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .edu-hero-text p { 
+            color: #546e7a;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        #unlock-trigger { 
+            background: linear-gradient(135deg, #1a237e, #283593);
+            border: none;
+            border-radius: 15px;
+            padding: 25px 40px;
+            cursor: pointer !important; /* FIXED: Added cursor pointer */
+            transition: all 0.3s ease;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 8px 24px rgba(26, 35, 126, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+        }
+        #unlock-trigger:hover { 
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(26, 35, 126, 0.4);
+        }
+        #unlock-trigger .unlock-status { 
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 10px;
+            font-weight: 400;
+        }
+        
+        .edu-features { 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        .edu-feature { 
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            border: 1px solid #e0e0e0;
+        }
+        .edu-feature h3 { 
+            color: #1a237e;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .edu-feature p { 
+            color: #546e7a;
+            font-size: 14px;
+            line-height: 1.5;
+        }
         
         /* ═══ OS DESKTOP ═══ */
         #os { position: fixed; inset: 0; display: flex; flex-direction: column; opacity: 0;
@@ -133,9 +389,6 @@
             background: rgba(255,255,255,0.03); border: 2px solid transparent; position: relative; }
         .desktop-icon:hover { background: rgba(255,255,255,0.08); border-color: var(--border-acc);
             transform: translateY(-5px) scale(1.05); box-shadow: var(--shadow-md); }
-        .desktop-icon::after { content: ''; position: absolute; inset: 0; border-radius: 16px;
-            background: linear-gradient(135deg, transparent, var(--glow), transparent); opacity: 0; transition: opacity 0.3s; }
-        .desktop-icon:hover::after { opacity: 1; }
         .desktop-icon-img { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; }
         .desktop-icon-img svg { width: 100%; height: 100%; filter: drop-shadow(0 0 10px rgba(0,212,255,0.3)); }
         .desktop-icon-label { font-size: 14px; color: var(--txt); text-align: center; font-weight: 600;
@@ -145,32 +398,13 @@
         /* ═══ WINDOWS ═══ */
         .window { position: absolute; background: var(--bg2); border: 1px solid var(--border-acc);
             border-radius: 16px; box-shadow: var(--shadow-lg); display: flex; flex-direction: column;
-            opacity: 0; pointer-events: none; min-width: 600px; min-height: 500px; overflow: hidden; }
+            opacity: 0; pointer-events: none; min-width: 600px; min-height: 500px; overflow: hidden;
+            resize: none; }
         .window.show { opacity: 1; pointer-events: auto; z-index: 100; }
         .window.maximized { top: 0 !important; left: 0 !important; right: 0 !important; bottom: 56px !important;
             width: 100% !important; height: calc(100% - 56px) !important; border-radius: 0; }
         .window.minimized { opacity: 0; pointer-events: none; transform: translateY(100px); }
         .window.resizing { transition: none !important; }
-        
-        /* Window Tabs */
-        .window-tabs { display: flex; background: var(--bg3); border-bottom: 1px solid var(--border);
-            overflow-x: auto; padding-left: 8px; }
-        .window-tab { display: flex; align-items: center; gap: 10px; padding: 12px 20px;
-            background: transparent; border-right: 1px solid var(--border); cursor: pointer;
-            transition: all 0.2s; min-width: 200px; position: relative; }
-        .window-tab:hover { background: rgba(255,255,255,0.05); }
-        .window-tab.active { background: var(--bg2); border-bottom: 2px solid var(--acc); }
-        .window-tab-icon { font-size: 16px; flex-shrink: 0; }
-        .window-tab-title { flex: 1; font-size: 13px; overflow: hidden; text-overflow: ellipsis;
-            white-space: nowrap; color: var(--txt2); font-weight: 500; }
-        .window-tab.active .window-tab-title { color: var(--txt); }
-        .window-tab-close { font-size: 18px; opacity: 0.5; color: var(--txt2); padding: 4px;
-            border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-        .window-tab:hover .window-tab-close { opacity: 1; }
-        .window-tab-close:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
-        .window-tab-new { padding: 12px 20px; background: transparent; border: none;
-            color: var(--txt2); cursor: pointer; font-size: 20px; transition: all 0.2s; }
-        .window-tab-new:hover { background: rgba(255,255,255,0.05); color: var(--txt); }
         
         /* Window Title Bar */
         .window-titlebar { display: flex; align-items: center; gap: 12px; padding: 12px 16px;
@@ -183,17 +417,6 @@
             display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .window-btn:hover { background: rgba(255,255,255,0.1); color: var(--txt); }
         .window-btn.close:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
-        
-        /* Resize Handles */
-        .window-resize-handle { position: absolute; z-index: 1000; }
-        .window-resize-n { top: 0; left: 10px; right: 10px; height: 4px; cursor: n-resize; }
-        .window-resize-s { bottom: 0; left: 10px; right: 10px; height: 4px; cursor: s-resize; }
-        .window-resize-e { top: 10px; right: 0; bottom: 10px; width: 4px; cursor: e-resize; }
-        .window-resize-w { top: 10px; left: 0; bottom: 10px; width: 4px; cursor: w-resize; }
-        .window-resize-ne { top: 0; right: 0; width: 15px; height: 15px; cursor: ne-resize; }
-        .window-resize-nw { top: 0; left: 0; width: 15px; height: 15px; cursor: nw-resize; }
-        .window-resize-se { bottom: 0; right: 0; width: 15px; height: 15px; cursor: se-resize; }
-        .window-resize-sw { bottom: 0; left: 0; width: 15px; height: 15px; cursor: sw-resize; }
         
         /* Tab Content */
         .tab-content { display: none; flex: 1; overflow: hidden; position: relative; }
@@ -214,7 +437,7 @@
             font-family: 'Fira Code', monospace; }
         .nav-go { padding: 10px 20px; background: var(--acc); color: var(--bg); border: none;
             border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .nav-go:hover { background: var(--acc-light); transform: translateY(-1px); }
+        .nav-go:hover { background: var(--acc); filter: brightness(1.2); transform: translateY(-1px); }
         
         .frame-loading { position: absolute; inset: 0; display: flex; flex-direction: column;
             align-items: center; justify-content: center; gap: 20px; background: #000;
@@ -243,7 +466,7 @@
         
         .grid-header { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; }
         .grid-title { font-size: 32px; font-weight: 900; color: var(--txt); font-family: 'Orbitron',sans-serif;
-            background: linear-gradient(135deg, var(--acc), var(--acc-light)); -webkit-background-clip: text;
+            background: linear-gradient(135deg, var(--acc), #6fe7ff); -webkit-background-clip: text;
             -webkit-text-fill-color: transparent; text-shadow: 0 0 30px var(--glow); }
         .grid-subtitle { font-size: 14px; color: var(--txt2); margin-top: 8px; }
         
@@ -253,7 +476,7 @@
             display: flex; align-items: center; gap: 8px; font-weight: 500; }
         .grid-btn:hover { background: rgba(255,255,255,0.05); border-color: var(--border-acc); }
         .grid-btn.primary { background: var(--acc); color: var(--bg); border-color: var(--acc); }
-        .grid-btn.primary:hover { background: var(--acc-light); transform: translateY(-1px); }
+        .grid-btn.primary:hover { background: var(--acc); filter: brightness(1.2); transform: translateY(-1px); }
         
         .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .item-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 16px;
@@ -268,20 +491,18 @@
         .item-content { flex: 1; }
         .item-name { font-size: 18px; font-weight: 700; color: var(--txt); }
         .item-desc { font-size: 13px; color: var(--txt2); margin-top: 6px; line-height: 1.5; }
-        .item-links { display: flex; gap: 8px; margin-top: 12px; }
-        .link-btn { padding: 6px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-            border-radius: 6px; font-size: 12px; color: var(--txt2); cursor: pointer; transition: all 0.2s; }
+        .item-links { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .link-btn { padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            border-radius: 8px; font-size: 13px; color: var(--txt2); cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px; }
         .link-btn:hover { background: var(--glow); color: var(--txt); }
-        .item-actions { display: flex; gap: 8px; margin-top: 16px; }
-        .action-btn { padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-            border-radius: 8px; font-size: 12px; color: var(--txt2); cursor: pointer; transition: all 0.2s; }
-        .action-btn:hover { background: var(--glow); color: var(--txt); }
-        .action-btn.delete:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .link-number { font-size: 11px; background: var(--acc); color: var(--bg); width: 20px; height: 20px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         
-        /* Search Results */
+        /* Search Results - FIXED Z-INDEX */
         .search-results { position: absolute; top: 100%; left: 0; right: 0; max-height: 500px;
             overflow-y: auto; background: var(--bg2); border: 1px solid var(--border-acc);
-            border-radius: 0 0 16px 16px; box-shadow: var(--shadow-lg); display: none; z-index: 999; }
+            border-radius: 0 0 16px 16px; box-shadow: var(--shadow-lg); display: none; z-index: 99999; }
         .search-results.show { display: block; }
         .search-result-item { padding: 16px 20px; display: flex; align-items: center; gap: 16px;
             cursor: pointer; transition: all .15s; border-bottom: 1px solid var(--border); }
@@ -345,26 +566,6 @@
         input:checked + .slider { background-color: var(--acc); border-color: var(--acc); }
         input:checked + .slider:before { transform: translateX(24px); background-color: white; }
         
-        /* Form for adding new items */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-            z-index: 1000; display: none; align-items: center; justify-content: center; }
-        .modal-overlay.show { display: flex; }
-        .modal { background: var(--bg2); border: 1px solid var(--border-acc); border-radius: 20px;
-            padding: 32px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;
-            box-shadow: var(--shadow-lg); }
-        .modal-header { margin-bottom: 24px; }
-        .modal-title { font-size: 24px; font-weight: 700; color: var(--txt); }
-        .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none;
-            color: var(--txt2); font-size: 24px; cursor: pointer; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--txt);
-            margin-bottom: 8px; }
-        .form-input { width: 100%; padding: 12px 16px; background: var(--bg3); border: 1px solid var(--border);
-            border-radius: 10px; color: var(--txt); font-size: 14px; transition: all 0.2s; }
-        .form-input:focus { outline: none; border-color: var(--acc); box-shadow: 0 0 0 3px var(--glow); }
-        .form-textarea { min-height: 100px; resize: vertical; }
-        .form-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; }
-        
         /* ═══ TASKBAR ═══ */
         #taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; z-index: 200;
             background: rgba(21,27,61,0.95); backdrop-filter: blur(20px);
@@ -373,7 +574,7 @@
         
         .taskbar-start { display: flex; align-items: center; gap: 16px; }
         .start-btn { width: 52px; height: 52px; border-radius: 14px;
-            background: linear-gradient(135deg, var(--acc), var(--acc-dark)); border: none;
+            background: linear-gradient(135deg, var(--acc), rgba(0,212,255,0.7)); border: none;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: all 0.3s; box-shadow: 0 4px 20px var(--glow); }
         .start-btn:hover { transform: scale(1.1) rotate(10deg); box-shadow: 0 6px 30px var(--glow); }
@@ -388,15 +589,42 @@
         .search-taskbar input::placeholder { color: var(--txt2); }
         
         .taskbar-windows { display: flex; gap: 8px; flex: 1; overflow-x: auto; padding: 0 16px; }
-        .taskbar-window-btn { padding: 10px 20px; background: var(--bg3); border: 1px solid var(--border);
+        .taskbar-window-btn { padding: 10px 16px; background: var(--bg3); border: 1px solid var(--border);
             border-radius: 10px; cursor: pointer; transition: all 0.2s; display: flex;
-            align-items: center; gap: 10px; min-width: 180px; max-width: 220px; }
+            align-items: center; gap: 10px; min-width: 180px; max-width: 220px; position: relative; }
         .taskbar-window-btn:hover { background: rgba(255,255,255,0.08); }
         .taskbar-window-btn.active { background: var(--glow); border-color: var(--border-acc); }
         .taskbar-window-icon { font-size: 18px; }
         .taskbar-window-title { flex: 1; font-size: 13px; font-weight: 500; overflow: hidden;
             text-overflow: ellipsis; white-space: nowrap; color: var(--txt2); }
         .taskbar-window-btn.active .taskbar-window-title { color: var(--txt); }
+        
+        /* Taskbar Close Button */
+        .taskbar-close-btn {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--txt2);
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        
+        .taskbar-window-btn:hover .taskbar-close-btn {
+            opacity: 1;
+        }
+        
+        .taskbar-close-btn:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+        }
         
         .taskbar-end { display: flex; align-items: center; gap: 16px; margin-left: auto; }
         .taskbar-icon { width: 44px; height: 44px; border-radius: 12px; background: transparent;
@@ -424,9 +652,8 @@
         .start-logo svg { width: 100%; height: 100%; filter: drop-shadow(0 0 20px rgba(0,212,255,0.5)); }
         .start-brand { flex: 1; }
         .start-title { font-size: 36px; font-weight: 900; font-family: 'Orbitron',sans-serif;
-            background: linear-gradient(135deg, var(--acc), var(--acc-light));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 40px var(--glow); letter-spacing: 2px; }
+            background: linear-gradient(135deg, var(--acc), #6fe7ff); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; text-shadow: 0 0 40px var(--glow); letter-spacing: 2px; }
         .start-subtitle { font-size: 14px; color: var(--txt2); margin-top: 8px; }
         .start-version { position: absolute; top: 32px; right: 32px; font-size: 12px; color: var(--txt2); }
         
@@ -445,14 +672,6 @@
         .start-item-icon { font-size: 36px; }
         .start-item-label { font-size: 13px; font-weight: 600; color: var(--txt); }
         
-        .start-quick-links { display: flex; flex-direction: column; gap: 12px; }
-        .quick-link { padding: 16px; background: var(--bg3); border: 1px solid var(--border);
-            border-radius: 12px; display: flex; align-items: center; gap: 12px;
-            cursor: pointer; transition: all 0.2s; }
-        .quick-link:hover { background: rgba(255,255,255,0.05); }
-        .quick-link-icon { font-size: 20px; }
-        .quick-link-text { flex: 1; font-size: 14px; font-weight: 500; color: var(--txt); }
-        
         /* ═══ TOAST ═══ */
         .toast { position: fixed; top: 24px; right: 24px; z-index: 9999;
             background: var(--bg2); border: 1px solid var(--border-acc); border-radius: 16px;
@@ -466,18 +685,6 @@
         .toast-msg { font-size: 13px; color: var(--txt2); margin-top: 4px; line-height: 1.4; }
         .toast.success { border-color: rgba(34,197,94,0.4); }
         .toast.error { border-color: rgba(239,68,68,0.4); }
-        
-        /* ═══ CONTEXT MENU ═══ */
-        #context-menu { position: fixed; min-width: 240px; background: var(--bg2);
-            border: 1px solid var(--border-acc); border-radius: 16px; padding: 12px;
-            box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none;
-            transition: opacity .2s; z-index: 9998; }
-        #context-menu.show { opacity: 1; pointer-events: auto; }
-        .context-item { padding: 12px 16px; border-radius: 10px; cursor: pointer;
-            display: flex; align-items: center; gap: 14px; font-size: 14px;
-            color: var(--txt); transition: all .15s; }
-        .context-item:hover { background: var(--glow); }
-        .context-icon { font-size: 18px; width: 24px; text-align: center; }
         
         @media(max-width: 1024px) {
             #start-menu { width: calc(100% - 40px); height: 80vh; }
@@ -493,6 +700,35 @@
     </style>
 </head>
 <body class="theme-midnight">
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen">
+        <div class="loading-logo">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="loadingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:var(--acc);stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:rgba(0,212,255,0.8);stop-opacity:0.8" />
+                        <stop offset="100%" style="stop-color:rgba(0,212,255,0.6);stop-opacity:0.6" />
+                    </linearGradient>
+                    <filter id="loadingGlow">
+                        <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <path d="M 50 10 L 70 50 L 90 90 L 10 90 L 30 50 Z" fill="url(#loadingGrad)" filter="url(#loadingGlow)"/>
+                <path d="M 50 10 L 60 30 L 50 35 L 40 30 Z" fill="#ffffff" filter="url(#loadingGlow)"/>
+            </svg>
+        </div>
+        <div class="loading-text">PEAK OS</div>
+        <div class="loading-stats" id="loading-stats">Initializing system...</div>
+        <div class="loading-bar">
+            <div class="loading-progress" id="loading-progress"></div>
+        </div>
+    </div>
 
     <!-- CUSTOM CURSOR -->
     <div id="cursor">
@@ -511,15 +747,35 @@
             </div>
             
             <section class="edu-hero">
-                <div>
-                    <h2>Welcome Back, Student!</h2>
-                    <p>Access your classes, view assignments, and connect with teachers through our integrated learning platform.</p>
-                </div>
-                <div>
-                    <button id="unlock-trigger">
-                        🔓 Initialize Session
-                        <div class="unlock-status" id="unlock-status">Click 3 times to unlock</div>
-                    </button>
+                <div class="edu-hero-content">
+                    <div class="edu-hero-text">
+                        <h2>Welcome Back, Student!</h2>
+                        <p>Access your classes, view assignments, and connect with teachers through our integrated learning platform. Manage your academic journey with our comprehensive tools and resources.</p>
+                        <div class="edu-features">
+                            <div class="edu-feature">
+                                <h3>Class Schedule</h3>
+                                <p>View your daily schedule and upcoming classes</p>
+                            </div>
+                            <div class="edu-feature">
+                                <h3>Assignments</h3>
+                                <p>Track assignments, due dates, and submit work</p>
+                            </div>
+                            <div class="edu-feature">
+                                <h3>Grades</h3>
+                                <p>Check your grades and academic progress</p>
+                            </div>
+                            <div class="edu-feature">
+                                <h3>Resources</h3>
+                                <p>Access learning materials and library resources</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button id="unlock-trigger">
+                            🔓 Initialize Session
+                            <div class="unlock-status" id="unlock-status">Click 3 times to unlock</div>
+                        </button>
+                    </div>
                 </div>
             </section>
         </div>
@@ -535,8 +791,8 @@
                     <defs>
                         <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" style="stop-color:var(--acc);stop-opacity:1" />
-                            <stop offset="50%" style="stop-color:var(--acc-light);stop-opacity:0.8" />
-                            <stop offset="100%" style="stop-color:var(--acc-dark);stop-opacity:0.6" />
+                            <stop offset="50%" style="stop-color:rgba(0,212,255,0.8);stop-opacity:0.8" />
+                            <stop offset="100%" style="stop-color:rgba(0,212,255,0.6);stop-opacity:0.6" />
                         </linearGradient>
                         <filter id="glow">
                             <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
@@ -602,89 +858,33 @@
                     </div>
                     <div class="desktop-icon-label">Styles</div>
                 </div>
-                <div class="desktop-icon" data-app="partners">
-                    <div class="desktop-icon-img">
-                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M 50 20 L 70 40 L 90 35 L 85 60 L 95 80 L 70 75 L 50 90 L 30 75 L 5 80 L 15 60 L 10 35 L 30 40 Z" fill="currentColor"/>
-                        </svg>
-                    </div>
-                    <div class="desktop-icon-label">Partners</div>
-                </div>
-                <div class="desktop-icon" data-app="updates">
+                <div class="desktop-icon" data-app="settings">
                     <div class="desktop-icon-img">
                         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="4"/>
-                            <circle cx="50" cy="30" r="5" fill="currentColor"/>
-                            <circle cx="50" cy="50" r="5" fill="currentColor"/>
-                            <circle cx="50" cy="70" r="5" fill="currentColor"/>
+                            <circle cx="50" cy="30" r="6" fill="currentColor"/>
+                            <circle cx="65" cy="40" r="6" fill="currentColor"/>
+                            <circle cx="35" cy="40" r="6" fill="currentColor"/>
+                            <circle cx="50" cy="70" r="6" fill="currentColor"/>
                         </svg>
                     </div>
-                    <div class="desktop-icon-label">Updates</div>
+                    <div class="desktop-icon-label">Settings</div>
+                </div>
+                <div class="desktop-icon" data-app="partners">
+                    <div class="desktop-icon-img">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="35" cy="40" r="15" fill="currentColor"/>
+                            <circle cx="65" cy="40" r="15" fill="currentColor"/>
+                            <path d="M 20 70 Q 35 50 50 70 Q 65 50 80 70 L 80 85 L 20 85 Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="desktop-icon-label">Partners</div>
                 </div>
             </div>
         </div>
         
         <!-- Window Container -->
         <div id="windows-container"></div>
-        
-        <!-- Modal for adding new items -->
-        <div class="modal-overlay" id="add-proxy-modal">
-            <div class="modal">
-                <button class="modal-close">&times;</button>
-                <div class="modal-header">
-                    <div class="modal-title">Add New Proxy</div>
-                </div>
-                <form id="add-proxy-form">
-                    <div class="form-group">
-                        <label class="form-label">Proxy Name</label>
-                        <input type="text" class="form-input" name="name" placeholder="Enter proxy name" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Icon</label>
-                        <input type="text" class="form-input" name="icon" placeholder="Emoji or icon code" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Links (one per line, format: Display Name|URL)</label>
-                        <textarea class="form-input form-textarea" name="links" placeholder="Main|https://example.com&#10;Backup|https://backup.example.com" required></textarea>
-                    </div>
-                    <div class="form-buttons">
-                        <button type="button" class="grid-btn modal-close">Cancel</button>
-                        <button type="submit" class="grid-btn primary">Add Proxy</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        <div class="modal-overlay" id="add-game-modal">
-            <div class="modal">
-                <button class="modal-close">&times;</button>
-                <div class="modal-header">
-                    <div class="modal-title">Add New Game</div>
-                </div>
-                <form id="add-game-form">
-                    <div class="form-group">
-                        <label class="form-label">Game Name</label>
-                        <input type="text" class="form-input" name="name" placeholder="Enter game name" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Icon</label>
-                        <input type="text" class="form-input" name="icon" placeholder="Emoji or icon code" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Category</label>
-                        <input type="text" class="form-input" name="category" placeholder="Action, Puzzle, etc." required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Game URL</label>
-                        <input type="url" class="form-input" name="url" placeholder="https://example.com/game.html" required>
-                    </div>
-                    <div class="form-buttons">
-                        <button type="button" class="grid-btn modal-close">Cancel</button>
-                        <button type="submit" class="grid-btn primary">Add Game</button>
-                    </div>
-                </form>
-            </div>
-        </div>
         
         <!-- Start Menu -->
         <div id="start-menu">
@@ -694,8 +894,8 @@
                         <defs>
                             <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" style="stop-color:var(--acc);stop-opacity:1" />
-                                <stop offset="50%" style="stop-color:var(--acc-light);stop-opacity:0.8" />
-                                <stop offset="100%" style="stop-color:var(--acc-dark);stop-opacity:0.6" />
+                                <stop offset="50%" style="stop-color:rgba(0,212,255,0.8);stop-opacity:0.8" />
+                                <stop offset="100%" style="stop-color:rgba(0,212,255,0.6);stop-opacity:0.6" />
                             </linearGradient>
                         </defs>
                         <path d="M 50 10 L 70 50 L 90 90 L 10 90 L 30 50 Z" fill="url(#logoGrad)"/>
@@ -706,7 +906,7 @@
                     <div class="start-title">PEAK OS</div>
                     <div class="start-subtitle">Advanced Browser Environment</div>
                 </div>
-                <div class="start-version">v2.0</div>
+                <div class="start-version">v2.1</div>
             </div>
             <div class="start-content">
                 <div class="start-section">
@@ -736,26 +936,9 @@
                             <div class="start-item-icon">🔄</div>
                             <div class="start-item-label">Updates</div>
                         </div>
-                    </div>
-                </div>
-                <div class="start-section">
-                    <div class="start-section-title">⚡ Quick Actions</div>
-                    <div class="start-quick-links">
-                        <div class="quick-link" data-action="add-proxy">
-                            <div class="quick-link-icon">➕</div>
-                            <div class="quick-link-text">Add New Proxy</div>
-                        </div>
-                        <div class="quick-link" data-action="add-game">
-                            <div class="quick-link-icon">🎮</div>
-                            <div class="quick-link-text">Add New Game</div>
-                        </div>
-                        <div class="quick-link" data-action="settings">
-                            <div class="quick-link-icon">⚙️</div>
-                            <div class="quick-link-text">System Settings</div>
-                        </div>
-                        <div class="quick-link" data-action="lock">
-                            <div class="quick-link-icon">🔒</div>
-                            <div class="quick-link-text">Lock Screen</div>
+                        <div class="start-item" data-action="lock">
+                            <div class="start-item-icon">🔒</div>
+                            <div class="start-item-label">Lock Screen</div>
                         </div>
                     </div>
                 </div>
@@ -782,7 +965,7 @@
             
             <div class="taskbar-end">
                 <div class="taskbar-icon" id="settings-btn" title="Settings">⚙️</div>
-                <div class="taskbar-icon" id="add-proxy-btn" title="Add Proxy">➕</div>
+                <div class="taskbar-icon" id="partners-btn" title="Partners">🤝</div>
                 <div class="taskbar-icon" id="lock-btn" title="Lock Screen">🔒</div>
                 <div class="taskbar-clock" id="taskbar-clock">
                     <div class="clock-time">--:--</div>
@@ -791,12 +974,9 @@
             </div>
         </div>
     </div>
-    
-    <!-- Context Menu -->
-    <div id="context-menu"></div>
 
     <script>
-// Enhanced version with all requested features
+// Enhanced version with loading screen and task manager
 
 // Utility functions
 const $ = s => document.querySelector(s);
@@ -825,32 +1005,87 @@ let settings = loadData('settings', {
     blur: true
 });
 
-// Apply settings
+// Apply settings - FIXED SWITCH ISSUE
 function applySettings() {
-    document.body.className = `theme-${settings.theme}`;
-    document.body.classList.toggle('high-contrast', settings.contrast);
-    document.body.classList.toggle('reduced-motion', settings.motion);
-    document.body.classList.toggle('font-large', settings.font);
-    document.body.classList.toggle('performance-mode', settings.performance);
-    document.body.classList.toggle('no-cursor', !settings.cursor);
-    if (!settings.animations) {
-        document.body.style.setProperty('--shadow-lg', 'none');
-        document.body.style.setProperty('--shadow-md', 'none');
-    }
-    if (!settings.blur) {
-        document.querySelectorAll('*').forEach(el => {
-            el.style.backdropFilter = 'none';
-        });
-    }
+    const body = document.body;
+    
+    // Remove all theme classes
+    body.className = body.className.replace(/theme-\w+/g, '');
+    body.classList.add(`theme-${settings.theme}`);
+    
+    // Remove all setting classes first
+    body.classList.remove('high-contrast', 'reduced-motion', 'font-large', 'performance-mode', 'no-cursor');
+    
+    // Add classes based on settings
+    if (settings.contrast) body.classList.add('high-contrast');
+    if (settings.motion) body.classList.add('reduced-motion');
+    if (settings.font) body.classList.add('font-large');
+    if (settings.performance) body.classList.add('performance-mode');
+    if (!settings.cursor) body.classList.add('no-cursor');
+    
+    // Apply background
     applyBackground(settings.background, settings.customBg);
 }
 applySettings();
 
-// Background system
+// LOADING SCREEN FUNCTIONALITY
+function initLoadingScreen() {
+    const loadingScreen = $('#loading-screen');
+    const loadingProgress = $('#loading-progress');
+    const loadingStats = $('#loading-stats');
+    
+    if (!loadingScreen) return;
+    
+    const steps = [
+        {text: "Initializing core modules...", progress: 10},
+        {text: "Loading graphics subsystem...", progress: 25},
+        {text: "Starting window manager...", progress: 40},
+        {text: "Loading desktop environment...", progress: 60},
+        {text: "Initializing network services...", progress: 75},
+        {text: "Starting security protocols...", progress: 90},
+        {text: "System ready!", progress: 100}
+    ];
+    
+    let currentStep = 0;
+    
+    function updateLoading() {
+        if (currentStep >= steps.length) {
+            // Hide loading screen
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 800);
+            }, 500);
+            return;
+        }
+        
+        const step = steps[currentStep];
+        loadingProgress.style.width = step.progress + '%';
+        loadingStats.textContent = step.text;
+        
+        currentStep++;
+        
+        // Random delay between steps for realistic loading
+        const delay = 300 + Math.random() * 500;
+        setTimeout(updateLoading, delay);
+    }
+    
+    // Start loading sequence
+    setTimeout(updateLoading, 800);
+}
+
+// Background system - FIXED
 function applyBackground(bg, customUrl) {
     const el = $('#desktop-bg');
-    el.className = 'bg-' + bg;
-    el.style.backgroundImage = bg === 'custom' && customUrl ? `url(${customUrl})` : '';
+    el.className = '';
+    el.classList.add('bg-' + bg);
+    
+    if (bg === 'custom' && customUrl) {
+        el.style.backgroundImage = `url(${customUrl})`;
+    } else {
+        el.style.backgroundImage = '';
+    }
 }
 
 // Toast notifications
@@ -873,30 +1108,54 @@ const toast = (title, msg, type='success') => {
     }, 3000);
 };
 
-// Cursor management - Simplified without ring
+// Cursor management - FIXED
 const cursor = $('#cursor');
 let cursorX = 0, cursorY = 0;
+let isDragging = false;
+let isResizing = false;
+
+// Initialize cursor position
+cursor.style.left = '0px';
+cursor.style.top = '0px';
 
 document.addEventListener('mousemove', e => {
     cursorX = e.clientX;
     cursorY = e.clientY;
     
     if (document.body.classList.contains('unlocked') && settings.cursor) {
-        cursor.style.left = cursorX + 'px';
-        cursor.style.top = cursorY + 'px';
+        cursor.style.left = (cursorX - 8) + 'px';
+        cursor.style.top = (cursorY - 8) + 'px';
     }
 });
 
-document.addEventListener('mousedown', () => cursor.classList.add('click'));
-document.addEventListener('mouseup', () => cursor.classList.remove('click'));
+document.addEventListener('mousedown', (e) => {
+    cursor.classList.add('click');
+    
+    // Check if we're resizing or dragging
+    const target = e.target;
+    if (target.classList.contains('window-titlebar') || 
+        target.closest('.window-titlebar')) {
+        document.body.classList.add('dragging');
+    }
+});
 
+document.addEventListener('mouseup', () => {
+    cursor.classList.remove('click');
+    document.body.classList.remove('dragging', 'resizing', 'resizing-ns', 'resizing-ew');
+});
+
+// Bind hover states
 const bindHover = () => {
-    const hoverElements = 'button,.desktop-icon,.start-item,.window-tab,.taskbar-icon,.window-btn,.context-item,.theme-card,.bg-card,.item-card,.search-result-item,.grid-btn,.action-btn,.link-btn,.quick-link';
+    const hoverElements = 'button,.desktop-icon,.start-item,.taskbar-icon,.window-btn,.context-item,.theme-card,.bg-card,.item-card,.search-result-item,.grid-btn,.action-btn,.link-btn,.nav-btn,.taskbar-window-btn,.taskbar-close-btn';
     $$(hoverElements).forEach(el => {
-        if (settings.cursor) {
-            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-        }
+        el.addEventListener('mouseenter', () => {
+            if (settings.cursor && document.body.classList.contains('unlocked')) {
+                cursor.classList.add('hover');
+            }
+        });
+        el.addEventListener('mouseleave', () => {
+            cursor.classList.remove('hover');
+        });
     });
 };
 
@@ -910,7 +1169,7 @@ if (unlockTrigger && unlockStatus) {
         unlockClicks++;
         unlockStatus.textContent = `Click ${3-unlockClicks} more time${3-unlockClicks===1?'':'s'}`;
         
-        // Add visual feedback
+        // Visual feedback
         this.style.transform = 'scale(0.95)';
         setTimeout(() => this.style.transform = '', 200);
         
@@ -926,45 +1185,46 @@ if (unlockTrigger && unlockStatus) {
                 bindHover();
                 updateClock();
                 
+                // Show cursor immediately
+                cursor.style.display = 'block';
+                
                 toast('Welcome to PeakOS', 'System unlocked successfully');
             }, 500);
         }
     });
 }
 
-// Data with user additions
+// Data with only requested games
 let PROXIES = loadData('proxies', [
-    {id:'truffled', name:'Truffled', icon:'🔵', links:[{t:'Main', u:'https://educational.radissontucson.com/'},{t:'Backup', u:'https://vacation.briaquaticcabinets.com/'}]},
-    {id:'overcloacked', name:'Overcloacked', icon:'⚡', links:[{t:'Primary', u:'https://d58o0iyi.beanweb.qzz.io.cdn.cloudflare.net/'}]},
-    {id:'fern', name:'Fern', icon:'🌿', links:[{t:'Main', u:'https://apple1.vandrekalenderen.dk/'}]},
-    {id:'infamous', name:'Infamous', icon:'🔥', links:[{t:'Link 1', u:'https://team-anti-drugs.acgcotton.com/'}]},
-    {id:'void', name:'Void', icon:'🌌', links:[{t:'EDU', u:'https://edu.ucecom-craiova.ro'}]}
+    {id:'truffled', name:'Truffled', icon:'🔵', links:[
+        {t:'Link 1', u:'https://educational.radissontucson.com/'},
+        {t:'Link 2', u:'https://vacation.briaquaticcabinets.com/'}
+    ]},
+    {id:'overcloacked', name:'Overcloacked', icon:'⚡', links:[
+        {t:'Link 1', u:'https://d58o0iyi.beanweb.qzz.io.cdn.cloudflare.net/'}
+    ]},
+    {id:'fern', name:'Fern', icon:'🌿', links:[
+        {t:'Link 1', u:'https://apple1.vandrekalenderen.dk/'}
+    ]},
+    {id:'infamous', name:'Infamous', icon:'🔥', links:[
+        {t:'Link 1', u:'https://team-anti-drugs.acgcotton.com/'}
+    ]},
+    {id:'void', name:'Void', icon:'🌌', links:[
+        {t:'Link 1', u:'https://edu.ucecom-craiova.ro'}
+    ]}
 ]);
 
 let GAMES = loadData('games', [
     {id:'car-survival', icon:'🚗', name:'Car Survival 3D', cat:'Action', url:'https://rawcdn.githack.com/genizy/brainrot/main/car-survival-3d/index.html'},
-    {id:'build-plane', icon:'✈️', name:'Build a Plane', cat:'Adventure', url:'https://rawcdn.githack.com/genizy/brainrot/main/build-a-plane/index.html'},
-    {id:'climbing', icon:'🧗', name:'Difficult Climbing', cat:'Adventure', url:'https://cdn.jsdelivr.net/gh/web-ports/adgac@main/index.html'},
-    {id:'soundboard', icon:'🔊', name:'Soundboard', cat:'Audio', url:'https://cdn.jsdelivr.net/gh/genizy/soundboard@main/index.html'},
-    {id:'polytrack', icon:'🏎️', name:'PolyTrack', cat:'Racing', url:'https://cdn.jsdelivr.net/gh/genizy/polytrack@latest/index.html'}
+    {id:'build-plane', icon:'✈️', name:'Build a Plane', cat:'Adventure', url:'https://rawcdn.githack.com/genizy/brainrot/main/build-a-plane/index.html'}
 ]);
-
-// PARTNERS DATA
-const PARTNERS = [
-    {name: 'Interstellar Proxy Network', icon: '🚀', desc: 'Premium proxy services'},
-    {name: 'GameHub Collective', icon: '🎮', desc: 'Game distribution platform'},
-    {name: 'Nebula Hosting', icon: '☁️', desc: 'Cloud hosting solutions'},
-    {name: 'Quantum Security', icon: '🔒', desc: 'Security and privacy tools'},
-    {name: 'Synthwave Devs', icon: '👨‍💻', desc: 'Web application development'},
-    {name: 'Retro Gaming Co.', icon: '👾', desc: 'Classic game preservation'}
-];
 
 // UPDATES DATA
 const UPDATES = [
-    {version: '2.0', date: '2024', title: 'Major UI Overhaul', desc: 'Complete redesign with new themes and features'},
-    {version: '1.5', date: '2024', title: 'Browser Engine Update', desc: 'Improved iframe handling and navigation'},
-    {version: '1.2', date: '2023', title: 'Game Library Expansion', desc: 'Added 10+ new games'},
-    {version: '1.0', date: '2023', title: 'Initial Release', desc: 'PeakOS Browser Environment launched'}
+    {version: '2.1', date: '2024', title: 'Cursor System Overhaul', desc: 'Fixed cursor disappearing bug, added drag/resize states'},
+    {version: '2.0', date: '2024', title: 'Major UI Redesign', desc: 'Complete visual overhaul with new theme system'},
+    {version: '1.5', date: '2023', title: 'Performance Improvements', desc: 'Optimized background animations and window management'},
+    {version: '1.0', date: '2023', title: 'Initial Release', desc: 'PeakOS Browser Environment launched with basic features'}
 ];
 
 // Clock
@@ -1005,119 +1265,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Modal handling
-$$('.modal-close').forEach(btn => {
-    btn.addEventListener('click', () => {
-        $$('.modal-overlay').forEach(m => m.classList.remove('show'));
-    });
-});
-
-$$('.modal-overlay').forEach(modal => {
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.remove('show');
-        }
-    });
-});
-
-// Add Proxy functionality
-$('#add-proxy-form')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const name = formData.get('name');
-    const icon = formData.get('icon');
-    const linksText = formData.get('links');
-    
-    const links = linksText.split('\n').map(line => {
-        const [t, u] = line.split('|').map(s => s.trim());
-        return {t, u};
-    }).filter(link => link.t && link.u);
-    
-    if (name && icon && links.length > 0) {
-        const newProxy = {
-            id: name.toLowerCase().replace(/\s+/g, '-'),
-            name,
-            icon,
-            links
-        };
-        
-        PROXIES.push(newProxy);
-        saveData('proxies', PROXIES);
-        $('#add-proxy-modal').classList.remove('show');
-        toast('Proxy Added', `${name} has been added successfully`);
-        
-        // Refresh if proxy hub is open
-        const hubWindow = windows.find(w => w.type === 'hub');
-        if (hubWindow) {
-            closeWindow(hubWindow.id);
-            setTimeout(() => openProxyHub(), 100);
-        }
-    }
-});
-
-// Add Game functionality
-$('#add-game-form')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const name = formData.get('name');
-    const icon = formData.get('icon');
-    const category = formData.get('category');
-    const url = formData.get('url');
-    
-    if (name && icon && category && url) {
-        const newGame = {
-            id: name.toLowerCase().replace(/\s+/g, '-'),
-            name,
-            icon,
-            cat: category,
-            url
-        };
-        
-        GAMES.push(newGame);
-        saveData('games', GAMES);
-        $('#add-game-modal').classList.remove('show');
-        toast('Game Added', `${name} has been added to your library`);
-        
-        // Refresh if games app is open
-        const gamesWindow = windows.find(w => w.type === 'games');
-        if (gamesWindow) {
-            closeWindow(gamesWindow.id);
-            setTimeout(() => openGamesApp(), 100);
-        }
-    }
-});
-
-// Quick actions
-$$('.quick-link[data-action]').forEach(link => {
-    link.addEventListener('click', () => {
-        const action = link.dataset.action;
-        switch(action) {
-            case 'add-proxy':
-                $('#add-proxy-modal').classList.add('show');
-                break;
-            case 'add-game':
-                $('#add-game-modal').classList.add('show');
-                break;
-            case 'settings':
-                openStylesApp();
-                break;
-            case 'lock':
-                lockBtn.click();
-                break;
-        }
-        closeStartMenu();
-    });
-});
-
-// Taskbar buttons
-$('#add-proxy-btn')?.addEventListener('click', () => {
-    $('#add-proxy-modal').classList.add('show');
-});
-
-$('#settings-btn')?.addEventListener('click', () => {
-    openStylesApp();
-});
-
 // Search functionality
 const searchInput = $('#taskbar-search');
 const searchResults = $('#search-results');
@@ -1135,7 +1282,7 @@ if (searchInput && searchResults) {
         const results = [];
         
         // Search apps
-        ['dashboard', 'hub', 'games', 'styles', 'partners', 'updates'].forEach(app => {
+        ['dashboard', 'hub', 'games', 'styles', 'settings', 'updates', 'partners'].forEach(app => {
             if (app.includes(query)) {
                 results.push({
                     type: 'app',
@@ -1206,8 +1353,9 @@ function getAppIcon(app) {
         hub: '🌐',
         games: '🎮',
         styles: '🎨',
-        partners: '🤝',
-        updates: '🔄'
+        settings: '⚙️',
+        updates: '🔄',
+        partners: '🤝'
     };
     return icons[app] || '📁';
 }
@@ -1223,8 +1371,9 @@ const createWindow = (title, icon, type, onContentReady) => {
     const win = document.createElement('div');
     win.className = 'window';
     win.id = id;
-    win.style.top = (60 + windows.length * 30) + 'px';
-    win.style.left = (120 + windows.length * 30) + 'px';
+    // Center window on screen
+    win.style.top = (window.innerHeight / 2 - 300) + 'px';
+    win.style.left = (window.innerWidth / 2 - 400) + 'px';
     win.style.width = '800px';
     win.style.height = '600px';
     
@@ -1238,19 +1387,11 @@ const createWindow = (title, icon, type, onContentReady) => {
             </div>
         </div>
         <div class="tab-content active" id="content-${id}"></div>
-        <div class="window-resize-handle window-resize-n"></div>
-        <div class="window-resize-handle window-resize-s"></div>
-        <div class="window-resize-handle window-resize-e"></div>
-        <div class="window-resize-handle window-resize-w"></div>
-        <div class="window-resize-handle window-resize-ne"></div>
-        <div class="window-resize-handle window-resize-nw"></div>
-        <div class="window-resize-handle window-resize-se"></div>
-        <div class="window-resize-handle window-resize-sw"></div>
     `;
     
     $('#windows-container').appendChild(win);
     
-    // Make window draggable and resizable
+    // Make window draggable and resizable with interact.js
     initInteractWindow(win);
     
     // Controls
@@ -1278,39 +1419,69 @@ const createWindow = (title, icon, type, onContentReady) => {
 };
 
 function initInteractWindow(win) {
-    let x = 0, y = 0;
+    let x = parseInt(win.style.left) || 0;
+    let y = parseInt(win.style.top) || 0;
+    let w = parseInt(win.style.width) || 800;
+    let h = parseInt(win.style.height) || 600;
     
     interact(win)
         .draggable({
             listeners: {
                 start(event) {
                     focusWindow(win.id);
+                    document.body.classList.add('dragging');
                 },
                 move(event) {
-                    x += event.dx;
-                    y += event.dy;
-                    
                     if (!win.classList.contains('maximized')) {
+                        x += event.dx;
+                        y += event.dy;
+                        
                         win.style.left = `${x}px`;
                         win.style.top = `${y}px`;
                     }
+                },
+                end() {
+                    document.body.classList.remove('dragging');
                 }
             }
         })
         .resizable({
             edges: { left: true, right: true, bottom: true, top: true },
             listeners: {
+                start(event) {
+                    focusWindow(win.id);
+                    document.body.classList.add('resizing');
+                    if (event.edges.left || event.edges.right) {
+                        document.body.classList.add('resizing-ew');
+                    }
+                    if (event.edges.top || event.edges.bottom) {
+                        document.body.classList.add('resizing-ns');
+                    }
+                },
                 move(event) {
                     if (!win.classList.contains('maximized')) {
+                        x = event.rect.left;
+                        y = event.rect.top;
+                        w = event.rect.width;
+                        h = event.rect.height;
+                        
                         Object.assign(win.style, {
-                            width: `${event.rect.width}px`,
-                            height: `${event.rect.height}px`,
-                            left: `${event.rect.left}px`,
-                            top: `${event.rect.top}px`
+                            width: `${w}px`,
+                            height: `${h}px`,
+                            left: `${x}px`,
+                            top: `${y}px`
                         });
                     }
+                },
+                end() {
+                    document.body.classList.remove('resizing', 'resizing-ns', 'resizing-ew');
                 }
-            }
+            },
+            modifiers: [
+                interact.modifiers.restrictSize({
+                    min: { width: 400, height: 300 }
+                })
+            ]
         });
 }
 
@@ -1322,6 +1493,7 @@ const closeWindow = (id) => {
     }
     windows = windows.filter(w => w.id !== id);
     updateTaskbarWindows();
+    toast('Window Closed', 'Window has been closed');
 };
 
 const minimizeWindow = (id) => {
@@ -1358,6 +1530,7 @@ const focusWindow = (id) => {
     updateTaskbarWindows();
 };
 
+// UPDATED: Taskbar windows with close buttons
 const updateTaskbarWindows = () => {
     const container = $('#taskbar-windows');
     if (!container) return;
@@ -1366,18 +1539,32 @@ const updateTaskbarWindows = () => {
         <div class="taskbar-window-btn ${w.id === activeWindowId && !w.minimized ? 'active' : ''}" data-id="${w.id}">
             <div class="taskbar-window-icon">${w.icon}</div>
             <div class="taskbar-window-title">${w.title}</div>
+            <button class="taskbar-close-btn" data-id="${w.id}" title="Close window">✕</button>
         </div>
     `).join('');
     
+    // Click to focus/restore
     $$('.taskbar-window-btn').forEach(btn => {
         const id = btn.dataset.id;
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            // Don't trigger if close button was clicked
+            if (e.target.classList.contains('taskbar-close-btn')) return;
+            
             const winData = windows.find(w => w.id === id);
             if (winData && winData.minimized) {
                 restoreWindow(id);
             } else {
                 focusWindow(id);
             }
+        });
+    });
+    
+    // Close button functionality
+    $$('.taskbar-close-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.id;
+            closeWindow(id);
         });
     });
     
@@ -1391,8 +1578,9 @@ const openApp = (appId) => {
         case 'hub': openProxyHub(); break;
         case 'games': openGamesApp(); break;
         case 'styles': openStylesApp(); break;
-        case 'partners': openPartnersApp(); break;
+        case 'settings': openSettingsApp(); break;
         case 'updates': openUpdatesApp(); break;
+        case 'partners': openPartnersApp(); break;
     }
     closeStartMenu();
 };
@@ -1404,7 +1592,7 @@ const openDashboardApp = () => {
                 <div class="grid-header">
                     <div>
                         <div class="grid-title">Dashboard</div>
-                        <div class="grid-subtitle">Welcome to PeakOS Browser Environment v2.0</div>
+                        <div class="grid-subtitle">Welcome to PeakOS Browser Environment v2.1</div>
                     </div>
                     <div class="grid-controls">
                         <button class="grid-btn" onclick="openApp('settings')">⚙️ Settings</button>
@@ -1451,13 +1639,13 @@ const openDashboardApp = () => {
                             • <strong>Drag windows</strong> to move them around<br>
                             • <strong>Resize windows</strong> from any edge<br>
                             • Use <strong>search bar</strong> to find anything quickly<br>
-                            • Add your own proxies and games
+                            • Press <strong>Ctrl+Shift+L</strong> to lock screen
                         </div>
                         <div style="font-size: 14px; color: var(--txt2); line-height: 1.6;">
-                            • <strong>Right-click</strong> for context menus<br>
-                            • <strong>Ctrl+Shift+L</strong> to lock screen<br>
                             • Customize in <strong>Styles app</strong><br>
-                            • Check <strong>Updates</strong> for new features
+                            • Adjust preferences in <strong>Settings</strong><br>
+                            • Check <strong>Updates</strong> for new features<br>
+                            • Games load in secure iframes
                         </div>
                     </div>
                 </div>
@@ -1477,10 +1665,6 @@ const openProxyHub = () => {
                         <div class="grid-title">Proxy Hub</div>
                         <div class="grid-subtitle">${PROXIES.length} secure proxies available</div>
                     </div>
-                    <div class="grid-controls">
-                        <button class="grid-btn" onclick="openApp('dashboard')">← Back</button>
-                        <button class="grid-btn primary" onclick="$('#add-proxy-modal').classList.add('show')">➕ Add Proxy</button>
-                    </div>
                 </div>
                 
                 <div class="item-grid">
@@ -1494,12 +1678,12 @@ const openProxyHub = () => {
                                 </div>
                             </div>
                             <div class="item-links">
-                                ${p.links.map(link => `
-                                    <button class="link-btn" data-url="${link.u}">${link.t}</button>
+                                ${p.links.map((link, index) => `
+                                    <button class="link-btn" data-url="${link.u}">
+                                        <span class="link-number">${index + 1}</span>
+                                        Link ${index + 1}
+                                    </button>
                                 `).join('')}
-                            </div>
-                            <div class="item-actions">
-                                <button class="action-btn delete" onclick="deleteProxy('${p.id}')">Delete</button>
                             </div>
                         </div>
                     `).join('')}
@@ -1510,19 +1694,33 @@ const openProxyHub = () => {
         $$('.link-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const proxy = PROXIES.find(p => p.id === btn.closest('.item-card').dataset.proxyId);
+                const proxyCard = btn.closest('.item-card');
+                const proxy = PROXIES.find(p => p.id === proxyCard.dataset.proxyId);
                 if (proxy) {
-                    const link = proxy.links.find(l => l.u === btn.dataset.url);
-                    if (link) openProxyUrl(`${proxy.name} - ${link.t}`, proxy.icon, link.u);
+                    const linkIndex = Array.from(proxyCard.querySelectorAll('.link-btn')).indexOf(btn);
+                    if (proxy.links[linkIndex]) {
+                        openProxyUrl(`${proxy.name} - Link ${linkIndex + 1}`, proxy.icon, proxy.links[linkIndex].u);
+                    }
                 }
             });
         });
         
         $$('.item-card[data-proxy-id]').forEach(card => {
             card.addEventListener('click', (e) => {
-                if (!e.target.closest('.link-btn') && !e.target.closest('.action-btn')) {
+                if (!e.target.closest('.link-btn')) {
                     const proxy = PROXIES.find(p => p.id === card.dataset.proxyId);
-                    if (proxy) openProxy(proxy);
+                    if (proxy && proxy.links.length === 1) {
+                        openProxyUrl(proxy.name, proxy.icon, proxy.links[0].u);
+                    } else if (proxy && proxy.links.length > 1) {
+                        // Show context menu for multiple links
+                        showContextMenu(e.clientX, e.clientY, 
+                            proxy.links.map((link, index) => ({
+                                icon: '🔗',
+                                label: `Link ${index + 1}`,
+                                action: () => openProxyUrl(`${proxy.name} - Link ${index + 1}`, proxy.icon, link.u)
+                            }))
+                        );
+                    }
                 }
             });
         });
@@ -1530,21 +1728,6 @@ const openProxyHub = () => {
         bindHover();
     });
 };
-
-function deleteProxy(id) {
-    if (confirm('Are you sure you want to delete this proxy?')) {
-        PROXIES = PROXIES.filter(p => p.id !== id);
-        saveData('proxies', PROXIES);
-        toast('Proxy Deleted', 'Proxy has been removed');
-        
-        // Refresh window
-        const hubWindow = windows.find(w => w.type === 'hub');
-        if (hubWindow) {
-            closeWindow(hubWindow.id);
-            setTimeout(() => openProxyHub(), 100);
-        }
-    }
-}
 
 const openGamesApp = () => {
     createWindow('Games', '🎮', 'games', (content) => {
@@ -1554,10 +1737,6 @@ const openGamesApp = () => {
                     <div>
                         <div class="grid-title">Game Library</div>
                         <div class="grid-subtitle">${GAMES.length} games available across multiple categories</div>
-                    </div>
-                    <div class="grid-controls">
-                        <button class="grid-btn" onclick="openApp('dashboard')">← Back</button>
-                        <button class="grid-btn primary" onclick="$('#add-game-modal').classList.add('show')">➕ Add Game</button>
                     </div>
                 </div>
                 
@@ -1571,34 +1750,22 @@ const openGamesApp = () => {
                                     <div class="item-desc">${g.cat}</div>
                                 </div>
                             </div>
-                            <div class="item-actions">
-                                <button class="action-btn" onclick="openGame(${JSON.stringify(g).replace(/"/g, '&quot;')}, true)">Play</button>
-                                <button class="action-btn delete" onclick="deleteGame('${g.id}')">Delete</button>
-                            </div>
                         </div>
                     `).join('')}
                 </div>
             </div>
         `;
         
+        $$('.item-card[data-game-id]').forEach(card => {
+            card.addEventListener('click', () => {
+                const game = GAMES.find(g => g.id === card.dataset.gameId);
+                if (game) openGame(game, true);
+            });
+        });
+        
         bindHover();
     });
 };
-
-function deleteGame(id) {
-    if (confirm('Are you sure you want to delete this game?')) {
-        GAMES = GAMES.filter(g => g.id !== id);
-        saveData('games', GAMES);
-        toast('Game Deleted', 'Game has been removed from library');
-        
-        // Refresh window
-        const gamesWindow = windows.find(w => w.type === 'games');
-        if (gamesWindow) {
-            closeWindow(gamesWindow.id);
-            setTimeout(() => openGamesApp(), 100);
-        }
-    }
-}
 
 const openStylesApp = () => {
     createWindow('Styles', '🎨', 'styles', (content) => {
@@ -1607,7 +1774,7 @@ const openStylesApp = () => {
                 <div class="styles-section">
                     <div class="styles-section-title">🎨 Themes</div>
                     <div class="theme-grid">
-                        ${['midnight', 'neon', 'aurora', 'sunset', 'cyber', 'matrix', 'space', 'fire'].map(t => `
+                        ${['midnight', 'neon', 'aurora', 'sunset', 'cyber', 'matrix', 'space'].map(t => `
                             <div class="theme-card ${settings.theme===t?'active':''}" data-theme="${t}"
                                  style="--preview-bg: ${getThemeGradient(t)};">
                                 <div class="theme-card-preview">${getThemeIcon(t)}</div>
@@ -1646,9 +1813,85 @@ const openStylesApp = () => {
                         </button>
                     </div>
                 </div>
+            </div>
+        `;
+        
+        // Theme selection
+        $$('.theme-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const theme = card.dataset.theme;
+                $$('.theme-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
                 
+                // Update settings
+                settings.theme = theme;
+                saveData('settings', settings);
+                
+                // Apply theme
+                document.body.className = document.body.className.replace(/theme-\w+/g, '');
+                document.body.classList.add(`theme-${theme}`);
+                
+                toast('Theme Changed', `Switched to ${theme} theme`);
+            });
+        });
+        
+        // Background selection - FIXED
+        $$('.bg-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const bg = card.dataset.bg;
+                $$('.bg-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                
+                // Update settings
+                settings.background = bg;
+                if (bg !== 'custom') {
+                    settings.customBg = null;
+                }
+                saveData('settings', settings);
+                
+                // Apply background
+                applyBackground(bg, settings.customBg);
+                
+                // Update preview
+                if (bg !== 'custom') {
+                    $('#custom-bg-preview').innerHTML = 'No custom background set';
+                }
+                
+                toast('Background Changed', getBgName(bg));
+            });
+        });
+        
+        // Custom background upload
+        const uploadInput = content.querySelector('#bg-upload');
+        if (uploadInput) {
+            uploadInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        settings.background = 'custom';
+                        settings.customBg = ev.target.result;
+                        saveData('settings', settings);
+                        applyBackground('custom', ev.target.result);
+                        $('#custom-bg-preview').innerHTML = `<img src="${ev.target.result}" alt="Custom Background">`;
+                        $$('.bg-card').forEach(c => c.classList.remove('active'));
+                        toast('Custom Background', 'Your image has been set as background');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        bindHover();
+    });
+};
+
+const openSettingsApp = () => {
+    createWindow('Settings', '⚙️', 'settings', (content) => {
+        content.innerHTML = `
+            <div class="styles-content">
                 <div class="styles-section">
-                    <div class="styles-section-title">⚙️ Settings</div>
+                    <div class="styles-section-title">⚙️ System Settings</div>
                     <div class="settings-controls">
                         ${[
                             {id:'cursor', label:'Custom Cursor', desc:'Enable/disable custom cursor'},
@@ -1656,7 +1899,9 @@ const openStylesApp = () => {
                             {id:'notifications', label:'Notifications', desc:'Show toast notifications'},
                             {id:'blur', label:'Glass Effect', desc:'Enable blur effects'},
                             {id:'contrast', label:'High Contrast', desc:'Increase contrast for accessibility'},
-                            {id:'font', label:'Large Font', desc:'Increase text size'}
+                            {id:'font', label:'Large Font', desc:'Increase text size'},
+                            {id:'performance', label:'Performance Mode', desc:'Disable background effects'},
+                            {id:'motion', label:'Reduced Motion', desc:'Disable animations'}
                         ].map(setting => `
                             <div class="setting-item">
                                 <div class="setting-info">
@@ -1674,53 +1919,6 @@ const openStylesApp = () => {
             </div>
         `;
         
-        // Theme selection
-        $$('.theme-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const theme = card.dataset.theme;
-                $$('.theme-card').forEach(c => c.classList.remove('active'));
-                card.classList.add('active');
-                document.body.className = document.body.className.replace(/theme-\w+/g, '');
-                document.body.classList.add(`theme-${theme}`);
-                settings.theme = theme;
-                saveData('settings', settings);
-                toast('Theme Changed', `Switched to ${theme} theme`);
-            });
-        });
-        
-        // Background selection
-        $$('.bg-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const bg = card.dataset.bg;
-                $$('.bg-card').forEach(c => c.classList.remove('active'));
-                card.classList.add('active');
-                settings.background = bg;
-                settings.customBg = null;
-                saveData('settings', settings);
-                applyBackground(bg);
-                $('#custom-bg-preview').innerHTML = 'No custom background set';
-                toast('Background Changed', getBgName(bg));
-            });
-        });
-        
-        // Custom background upload
-        $('#bg-upload').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    settings.background = 'custom';
-                    settings.customBg = ev.target.result;
-                    saveData('settings', settings);
-                    applyBackground('custom', ev.target.result);
-                    $('#custom-bg-preview').innerHTML = `<img src="${ev.target.result}" alt="Custom Background">`;
-                    $$('.bg-card').forEach(c => c.classList.remove('active'));
-                    toast('Custom Background', 'Your image has been set as background');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-        
         // Settings toggles
         $$('.switch input').forEach(input => {
             input.addEventListener('change', (e) => {
@@ -1731,6 +1929,55 @@ const openStylesApp = () => {
                 toast('Setting Updated', `${setting.replace(/([A-Z])/g, ' $1').toLowerCase()} ${e.target.checked?'enabled':'disabled'}`);
             });
         });
+        
+        bindHover();
+    });
+};
+
+const openPartnersApp = () => {
+    createWindow('Partners', '🤝', 'partners', (content) => {
+        content.innerHTML = `
+            <div class="content-grid">
+                <div class="grid-header">
+                    <div>
+                        <div class="grid-title">Partners</div>
+                        <div class="grid-subtitle">Our trusted partners and collaborators</div>
+                    </div>
+                </div>
+                
+                <div class="item-grid">
+                    <div class="item-card" style="text-align: center; padding: 40px;">
+                        <div class="item-icon" style="font-size: 60px; margin-bottom: 20px;">🤝</div>
+                        <div class="item-name">Partners Coming Soon</div>
+                        <div class="item-desc">We're currently building partnerships with leading services and platforms.</div>
+                        <div style="margin-top: 20px; font-size: 14px; color: var(--txt2);">
+                            Interested in partnering with us?<br>
+                            Contact us through our official channels.
+                        </div>
+                    </div>
+                    
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div class="item-icon">🚀</div>
+                            <div class="item-content">
+                                <div class="item-name">Future Integration</div>
+                                <div class="item-desc">Planned partnerships with popular services</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div class="item-icon">🔗</div>
+                            <div class="item-content">
+                                <div class="item-name">API Access</div>
+                                <div class="item-desc">Developer partnerships and integrations</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
         
         bindHover();
     });
@@ -1755,75 +2002,43 @@ function getThemeGradient(theme) {
         sunset: 'linear-gradient(135deg,#1a0e1a,#3d2340,#ff6b35)',
         cyber: 'linear-gradient(135deg,#0d0d1a,#27274d,#00ffff)',
         matrix: 'linear-gradient(135deg,#000f00,#002500,#00ff00)',
-        space: 'linear-gradient(135deg,#000016,#020246,#9370ff)',
-        fire: 'linear-gradient(135deg,#1a0500,#4d0f00,#ff3300)'
+        space: 'linear-gradient(135deg,#000016,#020246,#9370ff)'
     };
     return grads[theme] || grads.midnight;
 }
 
 function getThemeIcon(theme) {
     const icons = {
-        midnight:'🌙', neon:'💡', aurora:'🌈', sunset:'🌅', cyber:'🤖', matrix:'💚', space:'🚀', fire:'🔥'
+        midnight:'🌙', neon:'💡', aurora:'🌈', sunset:'🌅', cyber:'🤖', matrix:'💚', space:'🚀'
     };
     return icons[theme] || '🎨';
 }
 
 function getBgPreview(bg) {
     const previews = {
-        'gradient-1': 'linear-gradient(135deg, var(--bg), var(--bg3))',
-        'gradient-2': 'linear-gradient(135deg, #0a0e27, #1e2749, #00d4ff22)',
-        'gradient-3': 'linear-gradient(135deg, #1a0e0a, #3d2318)',
-        'gradient-4': 'linear-gradient(135deg, #0a1a0e, #1e3d27)',
+        'gradient-1': 'linear-gradient(135deg, #0a0e27, #1e2749)',
+        'gradient-2': 'linear-gradient(135deg, #1a0e0a, #3d2318)',
+        'gradient-3': 'linear-gradient(135deg, #0a1a0e, #1e3d27)',
+        'gradient-4': 'linear-gradient(135deg, #140a1a, #351e3d)',
         'stars': '#000',
-        'grid': 'repeating-linear-gradient(90deg, transparent, transparent 39px, var(--border) 40px), repeating-linear-gradient(0deg, transparent, transparent 39px, var(--border) 40px)',
-        'waves': 'radial-gradient(circle at 20% 80%, rgba(0,212,255,0.2) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(168,85,247,0.2) 0%, transparent 50%), var(--bg)'
+        'grid': 'repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.1) 40px), repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.1) 40px)',
+        'waves': 'radial-gradient(circle at 20% 80%, rgba(0,212,255,0.2) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(168,85,247,0.2) 0%, transparent 50%), #0a0e27'
     };
     return previews[bg] || '';
 }
 
 function getBgName(bg) {
     const names = {
-        'gradient-1': 'Primary Gradient',
-        'gradient-2': 'Accent Gradient',
-        'gradient-3': 'Sunset Gradient',
-        'gradient-4': 'Forest Gradient',
+        'gradient-1': 'Midnight Blue',
+        'gradient-2': 'Sunset Orange',
+        'gradient-3': 'Forest Green',
+        'gradient-4': 'Royal Purple',
         'stars': 'Starfield',
         'grid': 'Grid Pattern',
         'waves': 'Wave Mesh'
     };
     return names[bg] || bg;
 }
-
-const openPartnersApp = () => {
-    createWindow('Partners', '🤝', 'partners', (content) => {
-        content.innerHTML = `
-            <div class="content-grid">
-                <div class="grid-header">
-                    <div>
-                        <div class="grid-title">Partners</div>
-                        <div class="grid-subtitle">Our trusted partners and collaborators</div>
-                    </div>
-                </div>
-                
-                <div class="item-grid">
-                    ${PARTNERS.map(p => `
-                        <div class="item-card">
-                            <div class="item-header">
-                                <div class="item-icon">${p.icon}</div>
-                                <div class="item-content">
-                                    <div class="item-name">${p.name}</div>
-                                    <div class="item-desc">${p.desc}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-        
-        bindHover();
-    });
-};
 
 const openUpdatesApp = () => {
     createWindow('Updates', '🔄', 'updates', (content) => {
@@ -1851,11 +2066,11 @@ const openUpdatesApp = () => {
                     <div class="item-card" style="border: 2px dashed var(--border-acc);">
                         <div style="font-size: 18px; font-weight: 700; color: var(--acc); margin-bottom: 12px;">🚀 Upcoming</div>
                         <div style="font-size: 14px; color: var(--txt2); line-height: 1.6;">
-                            • Offline mode support<br>
-                            • More theme customization<br>
-                            • Built-in media player<br>
-                            • Plugin system<br>
-                            • Mobile app version
+                            • Tabbed browsing in windows<br>
+                            • Bookmark system for proxies<br>
+                            • Enhanced game library<br>
+                            • Multi-window support<br>
+                            • Plugin system for extensions
                         </div>
                     </div>
                 </div>
@@ -1870,11 +2085,12 @@ const openProxy = (proxy) => {
     if (proxy.links.length === 1) {
         openProxyUrl(proxy.name, proxy.icon, proxy.links[0].u);
     } else {
+        // Show context menu for multiple links
         showContextMenu(cursorX, cursorY, 
-            proxy.links.map(link => ({
+            proxy.links.map((link, index) => ({
                 icon: '🔗',
-                label: link.t,
-                action: () => openProxyUrl(`${proxy.name} - ${link.t}`, proxy.icon, link.u)
+                label: `Link ${index + 1}`,
+                action: () => openProxyUrl(`${proxy.name} - Link ${index + 1}`, proxy.icon, link.u)
             }))
         );
     }
@@ -1884,10 +2100,8 @@ const openProxyUrl = (title, icon, url) => {
     createWindow(title, icon, 'browser', (content) => {
         content.innerHTML = `
             <div class="frame-navbar">
-                <button class="nav-btn" onclick="this.closest('.window').querySelector('iframe').src = '${url}'">↻</button>
-                <button class="nav-btn" onclick="window.open('${url}', '_blank')">↗</button>
-                <input class="nav-url" value="${url}" readonly>
-                <button class="nav-go" onclick="navigateToUrl(this)">Go</button>
+                <button class="nav-btn" onclick="this.closest('.window').querySelector('iframe').src = this.closest('.window').querySelector('iframe').src" title="Reload">↻</button>
+                <button class="nav-btn" onclick="window.open('${url}', '_blank')" title="Open in new tab">↗</button>
             </div>
             <div class="content-frame">
                 <div class="frame-loading">
@@ -1910,26 +2124,6 @@ const openProxyUrl = (title, icon, url) => {
         const iframe = content.querySelector('iframe');
         const loading = content.querySelector('.frame-loading');
         const error = content.querySelector('.frame-error');
-        const urlInput = content.querySelector('.nav-url');
-        
-        // Make URL input editable and functional
-        urlInput.removeAttribute('readonly');
-        urlInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                navigateToUrl(urlInput);
-            }
-        });
-        
-        function navigateToUrl(input) {
-            let newUrl = input.value.trim();
-            if (!newUrl.startsWith('http')) {
-                newUrl = 'https://' + newUrl;
-                input.value = newUrl;
-            }
-            iframe.src = newUrl;
-            loading.classList.remove('hide');
-            error.classList.remove('show');
-        }
         
         let loadTimeout = setTimeout(() => {
             loading.classList.add('hide');
@@ -1939,7 +2133,6 @@ const openProxyUrl = (title, icon, url) => {
         iframe.addEventListener('load', () => {
             clearTimeout(loadTimeout);
             loading.classList.add('hide');
-            urlInput.value = iframe.contentWindow.location.href || url;
         });
         
         iframe.addEventListener('error', () => {
@@ -1955,43 +2148,68 @@ const openGame = (game, newWindow = false) => {
 };
 
 // Context menu
-const showContextMenu = (x, y, items) => {
-    const menu = $('#context-menu');
-    if (!menu) return;
+function showContextMenu(x, y, items) {
+    const menu = document.createElement('div');
+    menu.id = 'context-menu';
+    menu.className = 'context-menu';
+    menu.style.cssText = `
+        position: fixed;
+        min-width: 200px;
+        background: var(--bg2);
+        border: 1px solid var(--border-acc);
+        border-radius: 16px;
+        padding: 12px;
+        box-shadow: var(--shadow-lg);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .2s;
+        z-index: 9998;
+    `;
     
     menu.innerHTML = items.map(item => `
-        <div class="context-item" data-action="${items.indexOf(item)}">
-            <div class="context-icon">${item.icon}</div>
+        <div class="context-item" style="padding: 12px 16px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 14px; font-size: 14px; color: var(--txt); transition: all .15s;">
+            <div class="context-icon" style="font-size: 18px; width: 24px; text-align: center;">${item.icon}</div>
             <div>${item.label}</div>
         </div>
     `).join('');
     
+    document.body.appendChild(menu);
+    
     // Position menu
     const rect = menu.getBoundingClientRect();
-    if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width;
-    if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height;
+    if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
+    if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
     
     menu.style.left = x + 'px';
     menu.style.top = y + 'px';
-    menu.classList.add('show');
+    menu.style.opacity = '1';
+    menu.style.pointerEvents = 'auto';
     
-    $$('.context-item').forEach((el, idx) => {
+    // Add hover effects
+    $$('.context-item', menu).forEach((el, idx) => {
+        el.addEventListener('mouseenter', () => {
+            el.style.background = 'var(--glow)';
+        });
+        el.addEventListener('mouseleave', () => {
+            el.style.background = 'transparent';
+        });
         el.addEventListener('click', () => {
             items[idx].action();
-            menu.classList.remove('show');
+            menu.remove();
         });
     });
     
+    // Remove menu on click outside
     setTimeout(() => {
-        const hide = () => {
-            menu.classList.remove('show');
-            document.removeEventListener('click', hide);
+        const hide = (e) => {
+            if (!menu.contains(e.target)) {
+                menu.remove();
+                document.removeEventListener('click', hide);
+            }
         };
         document.addEventListener('click', hide);
     }, 100);
-    
-    bindHover();
-};
+}
 
 // Desktop icons
 $$('.desktop-icon[data-app]').forEach(icon => {
@@ -2012,6 +2230,19 @@ $$('.start-item[data-app]').forEach(item => {
     });
 });
 
+$$('.start-item[data-action]').forEach(item => {
+    item.addEventListener('click', () => {
+        if (item.dataset.action === 'lock' && lockBtn) {
+            lockBtn.click();
+        }
+        closeStartMenu();
+    });
+});
+
+// Taskbar buttons
+$('#settings-btn').addEventListener('click', () => openApp('settings'));
+$('#partners-btn').addEventListener('click', () => openApp('partners'));
+
 // Lock button
 const lockBtn = $('#lock-btn');
 if (lockBtn) {
@@ -2024,6 +2255,9 @@ if (lockBtn) {
         windows.forEach(w => closeWindow(w.id));
         closeStartMenu();
         toast('Locked', 'Screen locked successfully');
+        
+        // Hide custom cursor
+        cursor.style.display = 'none';
     });
 }
 
@@ -2037,6 +2271,11 @@ document.addEventListener('keydown', e => {
     }
     if (e.key === 'Escape' && startMenuOpen) {
         closeStartMenu();
+    }
+    // Close active window with Ctrl+W
+    if (e.ctrlKey && e.key === 'w' && activeWindowId) {
+        e.preventDefault();
+        closeWindow(activeWindowId);
     }
 });
 
@@ -2057,20 +2296,19 @@ function initBackground() {
     resize();
     window.addEventListener('resize', resize);
     
-    const particles = Array.from({length: 60}, () => ({
+    const particles = Array.from({length: 40}, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        r: Math.random() * 3 + 1,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 2 + 0.5,
         color: `rgba(0,212,255,${0.2 + Math.random() * 0.3})`
     }));
     
     const animate = () => {
         if (settings.performance) return;
         
-        ctx.fillStyle = 'rgba(10,14,39,0.05)';
-        ctx.fillRect(0, 0, w, h);
+        ctx.clearRect(0, 0, w, h);
         
         particles.forEach(p => {
             p.x += p.vx;
@@ -2083,22 +2321,6 @@ function initBackground() {
             ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             ctx.fillStyle = p.color;
             ctx.fill();
-            
-            // Connect nearby particles
-            particles.forEach(p2 => {
-                const dx = p.x - p2.x;
-                const dy = p.y - p2.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance < 100) {
-                    ctx.beginPath();
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(p2.x, p2.y);
-                    ctx.strokeStyle = `rgba(0,212,255,${0.1 * (1 - distance/100)})`;
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-            });
         });
         
         requestAnimationFrame(animate);
@@ -2108,8 +2330,14 @@ function initBackground() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    updateClock();
-    bindHover();
+    // Start loading screen
+    initLoadingScreen();
+    
+    // Initialize clock after a delay to match loading screen
+    setTimeout(() => {
+        updateClock();
+        bindHover();
+    }, 1500);
     
     // Auto-reset click counter after 10 seconds
     setInterval(() => {
