@@ -114,9 +114,69 @@
             filter: drop-shadow(0 0 8px #00ffaa);
         }
         
-        /* ═══ BACKGROUND SYSTEM WITH PEAK ═══ */
-        #desktop-bg { position: fixed; inset: 0; z-index: 0; transition: background .5s ease; display: flex; align-items: center; justify-content: center; }
-        .peak-watermark { position: absolute; font-family: 'Orbitron', sans-serif; font-size: 280px; font-weight: 900; color: rgba(255, 255, 255, 0.03); text-shadow: 0 0 100px rgba(0, 212, 255, 0.1); z-index: 0; pointer-events: none; transform: rotate(-15deg); letter-spacing: 40px; }
+        /* ═══ BACKGROUND SYSTEM WITH PEAK LOGO ═══ */
+        #desktop-bg { 
+            position: fixed; inset: 0; z-index: 0; 
+            transition: background .5s ease; 
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        
+        /* Peak Logo Background - Mountain as the 'A' in PEAK */
+        .peak-logo-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.03;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .peak-logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 40vw;
+            font-weight: 900;
+            color: var(--acc);
+            text-shadow: 0 0 100px var(--glow);
+            letter-spacing: 5vw;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .peak-logo-text span {
+            position: relative;
+        }
+        
+        .peak-logo-text span:nth-child(1) { /* P */ animation: float 20s infinite ease-in-out; }
+        .peak-logo-text span:nth-child(2) { /* E */ animation: float 20s infinite ease-in-out 2s; }
+        .peak-logo-text span:nth-child(3) { /* A - Mountain */ position: relative; }
+        .peak-logo-text span:nth-child(4) { /* K */ animation: float 20s infinite ease-in-out 4s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.03; }
+            50% { transform: translateY(-20px) rotate(1deg); opacity: 0.05; }
+        }
+        
+        .mountain-a {
+            position: relative;
+            width: 2em;
+            height: 2em;
+            display: inline-block;
+            margin: 0 0.2em;
+            vertical-align: middle;
+        }
+        
+        .mountain-a svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 30px rgba(0,212,255,0.3));
+        }
+        
         #desktop-bg.bg-gradient-1 { background: linear-gradient(135deg, #0a0e27 0%, #1e2749 100%); }
         #desktop-bg.bg-gradient-2 { background: linear-gradient(135deg, #1a0e0a 0%, #3d2318 100%); }
         #desktop-bg.bg-gradient-3 { background: linear-gradient(135deg, #0a1a0e 0%, #1e3d27 100%); }
@@ -148,18 +208,106 @@
         /* ═══ OS DESKTOP ═══ */
         #os { position: fixed; inset: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity .6s; pointer-events: none; }
         body.unlocked #os { opacity: 1; pointer-events: auto; }
-        #desktop { position: relative; z-index: 1; flex: 1; padding: 40px; overflow: hidden; }
-        .desktop-icons { display: grid; grid-template-columns: repeat(auto-fill, 120px); gap: 25px; grid-auto-rows: 120px; }
-        .desktop-icon { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px; border-radius: 16px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(255,255,255,0.03); border: 2px solid transparent; position: relative; overflow: hidden; }
-        .desktop-icon:hover { background: rgba(255,255,255,0.1); border-color: var(--border-acc); transform: translateY(-6px) scale(1.06); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
-        .desktop-icon:active { transform: translateY(-3px) scale(1.03); background: rgba(255,255,255,0.07); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
-        .desktop-icon-img { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
-        .desktop-icon-img svg { width: 100%; height: 100%; filter: drop-shadow(0 0 10px rgba(0,212,255,0.3)); }
-        .desktop-icon-label { font-size: 13px; color: var(--txt); text-align: center; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #desktop { position: relative; z-index: 2; flex: 1; padding: 30px; overflow: hidden; }
+        
+        /* ═══ SMALLER DESKTOP ICONS WITH BETTER TEXT ═══ */
+        .desktop-icons { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, 90px); 
+            gap: 20px; 
+            grid-auto-rows: 90px;
+        }
+        .desktop-icon { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 6px; 
+            padding: 12px; 
+            border-radius: 14px; 
+            cursor: pointer; 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+            background: rgba(255,255,255,0.03); 
+            border: 2px solid transparent; 
+            position: relative; 
+            overflow: hidden;
+            height: 90px;
+            width: 90px;
+        }
+        .desktop-icon:hover { 
+            background: rgba(255,255,255,0.1); 
+            border-color: var(--border-acc); 
+            transform: translateY(-4px) scale(1.05); 
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4); 
+        }
+        .desktop-icon:active { 
+            transform: translateY(-2px) scale(1.02); 
+            background: rgba(255,255,255,0.07); 
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3); 
+        }
+        .desktop-icon-img { 
+            width: 42px; 
+            height: 42px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .desktop-icon-img svg { 
+            width: 100%; 
+            height: 100%; 
+            filter: drop-shadow(0 0 10px rgba(0,212,255,0.3)); 
+        }
+        .desktop-icon-label { 
+            font-size: 11px; 
+            color: var(--txt); 
+            text-align: center; 
+            font-weight: 600; 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8); 
+            padding: 4px 6px; 
+            border-radius: 6px; 
+            background: rgba(0,0,0,0.4); 
+            backdrop-filter: blur(10px); 
+            max-width: 100%; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap;
+            line-height: 1.2;
+        }
         
         /* ═══ WINDOWS ═══ */
-        .window { position: absolute; background: var(--bg2); border: 1px solid var(--border-acc); border-radius: 14px; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; opacity: 0; pointer-events: none; min-width: 500px; min-height: 400px; overflow: hidden; resize: none; }
-        .window.show { opacity: 1; pointer-events: auto; z-index: 100; }
+        .window { 
+            position: absolute; 
+            background: var(--bg2); 
+            border: 1px solid var(--border-acc); 
+            border-radius: 14px; 
+            box-shadow: var(--shadow-lg); 
+            display: flex; 
+            flex-direction: column; 
+            opacity: 0; 
+            pointer-events: none; 
+            min-width: 500px; 
+            min-height: 400px; 
+            overflow: hidden; 
+            resize: none; 
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .window.show { 
+            opacity: 1; 
+            pointer-events: auto; 
+            z-index: 100; 
+            animation: windowAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes windowAppear {
+            0% { 
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            100% { 
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
         .window.maximized { top: 0 !important; left: 0 !important; right: 0 !important; bottom: 56px !important; width: 100% !important; height: calc(100% - 56px) !important; border-radius: 0; }
         .window.minimized { opacity: 0; pointer-events: none; transform: translateY(100px); }
         .window.resizing { transition: none !important; }
@@ -276,16 +424,81 @@
         .setting-item:hover .slider { border-color: var(--border-acc); }
         
         /* ═══ TASKBAR ═══ */
-        #taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 56px; z-index: 200; background: rgba(21,27,61,0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border-acc); display: flex; align-items: center; padding: 0 16px; gap: 12px; box-shadow: 0 -4px 20px rgba(0,0,0,0.4); }
+        #taskbar { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            height: 56px; 
+            z-index: 200; 
+            background: rgba(21,27,61,0.95); 
+            backdrop-filter: blur(20px); 
+            border-top: 1px solid var(--border-acc); 
+            display: flex; 
+            align-items: center; 
+            padding: 0 16px; 
+            gap: 12px; 
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.4); 
+        }
         .taskbar-start { display: flex; align-items: center; gap: 12px; }
-        .start-btn { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, var(--acc), rgba(0,212,255,0.8)); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 6px 25px var(--glow); position: relative; overflow: hidden; }
+        .start-btn { 
+            width: 48px; 
+            height: 48px; 
+            border-radius: 14px; 
+            background: linear-gradient(135deg, var(--acc), rgba(0,212,255,0.8)); 
+            border: none; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 6px 25px var(--glow); 
+            position: relative; 
+            overflow: hidden; 
+        }
         .start-btn:hover { transform: scale(1.15) rotate(15deg); box-shadow: 0 10px 35px var(--glow); }
         .start-btn:active { transform: scale(1.05) rotate(10deg); box-shadow: 0 6px 20px var(--glow); }
         .start-btn svg { width: 28px; height: 28px; }
-        .mountain-search-container { flex: 1; max-width: 600px; transition: all 0.3s ease; }
-        .mountain-search { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 25px; padding: 10px 20px; display: flex; align-items: center; gap: 12px; transition: all 0.3s; position: relative; }
-        .mountain-search:focus-within { border-color: var(--border-acc); box-shadow: 0 0 0 3px var(--glow); transform: translateY(-2px); }
-        .mountain-search input { flex: 1; background: transparent; border: none; outline: none; color: var(--txt); font-size: 14px; font-family: 'Inter', sans-serif; }
+        
+        /* Mountain Search in Bottom Right */
+        .mountain-search-container { 
+            position: absolute;
+            right: 16px;
+            bottom: 68px;
+            width: 400px;
+            max-width: calc(100% - 32px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: bottom right;
+            z-index: 199;
+        }
+        .mountain-search { 
+            width: 100%; 
+            background: var(--bg2); 
+            border: 1px solid var(--border-acc); 
+            border-radius: 16px; 
+            padding: 12px 16px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            position: relative; 
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+        }
+        .mountain-search:focus-within { 
+            border-color: var(--acc); 
+            box-shadow: 0 0 0 3px var(--glow), 0 12px 32px rgba(0,0,0,0.4); 
+            transform: translateY(-4px); 
+        }
+        .mountain-search input { 
+            flex: 1; 
+            background: transparent; 
+            border: none; 
+            outline: none; 
+            color: var(--txt); 
+            font-size: 14px; 
+            font-family: 'Inter', sans-serif; 
+        }
         .mountain-search input::placeholder { color: var(--txt2); }
         .taskbar-windows { display: flex; gap: 6px; flex: 1; overflow-x: auto; padding: 0 12px; }
         .taskbar-window-btn { padding: 10px 14px; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 10px; min-width: 160px; max-width: 200px; position: relative; overflow: hidden; }
@@ -330,11 +543,54 @@
         .start-item-icon { font-size: 32px; }
         .start-item-label { font-size: 12px; font-weight: 600; color: var(--txt); }
         
-        /* ═══ TOAST NOTIFICATIONS ═══ */
-        #toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; max-width: 350px; }
-        .toast { background: var(--bg2); border: 1px solid var(--border-acc); border-radius: 14px; padding: 16px 20px; min-width: 300px; box-shadow: var(--shadow-lg); transform: translateX(400px); transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
-        .toast.show { transform: translateX(0); }
-        .toast-icon { font-size: 24px; }
+        /* ═══ IMPROVED TOAST NOTIFICATIONS ═══ */
+        #toast-container { 
+            position: fixed; 
+            top: 24px; 
+            right: 24px; 
+            z-index: 9999; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            max-width: 350px;
+            pointer-events: none;
+        }
+        .toast { 
+            background: rgba(21, 27, 61, 0.95); 
+            border: 1px solid var(--border-acc); 
+            border-radius: 14px; 
+            padding: 16px 20px; 
+            min-width: 300px; 
+            box-shadow: var(--shadow-lg); 
+            transform: translateX(400px) scale(0.9); 
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+            display: flex; 
+            align-items: center; 
+            gap: 14px; 
+            margin-bottom: 8px; 
+            backdrop-filter: blur(10px);
+            pointer-events: auto;
+            opacity: 0;
+        }
+        .toast.show { 
+            transform: translateX(0) scale(1); 
+            opacity: 1;
+        }
+        .toast.hiding { 
+            transform: translateX(400px) scale(0.9); 
+            opacity: 0;
+        }
+        .toast-icon { 
+            font-size: 20px; 
+            width: 32px; 
+            height: 32px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 50%; 
+            flex-shrink: 0;
+        }
         .toast-content { flex: 1; }
         .toast-title { font-size: 14px; font-weight: 700; color: var(--txt); }
         .toast-msg { font-size: 12px; color: var(--txt2); margin-top: 3px; line-height: 1.4; }
@@ -346,12 +602,15 @@
             #start-menu { width: calc(100% - 32px); height: 75vh; }
             .start-grid { grid-template-columns: repeat(2, 1fr); }
             .item-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+            .desktop-icons { grid-template-columns: repeat(auto-fill, 80px); gap: 15px; }
+            .desktop-icon { width: 80px; height: 80px; }
         }
         @media(max-width: 768px) {
-            .desktop-icons { grid-template-columns: repeat(auto-fill, 110px); gap: 16px; }
+            .desktop-icons { grid-template-columns: repeat(auto-fill, 70px); gap: 12px; }
+            .desktop-icon { width: 70px; height: 70px; }
             .window { min-width: 100% !important; min-height: 400px !important; }
             .start-content { grid-template-columns: 1fr; }
-            .peak-watermark { font-size: 180px; }
+            .mountain-search-container { width: 300px; }
         }
     </style>
 </head>
@@ -421,8 +680,20 @@
     <!-- OS ENVIRONMENT -->
     <div id="os">
         <div id="desktop-bg" class="bg-gradient-1">
-            <canvas id="bg-canvas"></canvas>
-            <div class="peak-watermark">PEAK</div>
+            <!-- Peak Logo Background -->
+            <div class="peak-logo-bg">
+                <div class="peak-logo-text">
+                    <span>P</span>
+                    <span>E</span>
+                    <span class="mountain-a">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 50 10 L 70 50 L 90 90 L 10 90 L 30 50 Z" fill="currentColor"/>
+                            <path d="M 50 10 L 60 30 L 50 35 L 40 30 Z" fill="#ffffff"/>
+                        </svg>
+                    </span>
+                    <span>K</span>
+                </div>
+            </div>
         </div>
         
         <div id="desktop">
@@ -562,13 +833,6 @@
                         <path d="M 50 10 L 60 30 L 50 35 L 40 30 Z" fill="#ffffff"/>
                     </svg>
                 </button>
-                <div class="mountain-search-container" id="mountain-search-container" style="display: none;">
-                    <div class="mountain-search">
-                        <span>🔍</span>
-                        <input type="text" id="mountain-search-input" placeholder="Search apps, proxies, games...">
-                        <div class="search-results" id="mountain-search-results"></div>
-                    </div>
-                </div>
             </div>
             <div class="taskbar-windows" id="taskbar-windows"></div>
             <div class="taskbar-end">
@@ -579,6 +843,15 @@
                     <div class="clock-time">--:--</div>
                     <div class="clock-date">---</div>
                 </div>
+            </div>
+        </div>
+        
+        <!-- Mountain Search in Bottom Right -->
+        <div class="mountain-search-container" id="mountain-search-container" style="display: none;">
+            <div class="mountain-search">
+                <span>🔍</span>
+                <input type="text" id="mountain-search-input" placeholder="Search apps, proxies, games...">
+                <div class="search-results" id="mountain-search-results"></div>
             </div>
         </div>
     </div>
@@ -657,6 +930,7 @@ function applyBackground(bg, customUrl) {
     }
 }
 
+// Improved toast notifications with stacking
 const toast = (title, msg, type='success') => {
     if (!settings.notifications) return;
     let container = $('#toast-container');
@@ -675,16 +949,28 @@ const toast = (title, msg, type='success') => {
         </div>
     `;
     container.appendChild(t);
-    const toasts = $$('#toast-container .toast');
-    const index = toasts.indexOf(t);
-    const offset = index * 80;
+    
+    // Calculate position based on existing toasts
+    const existingToasts = $$('#toast-container .toast.show');
+    const offset = existingToasts.length * 90;
+    
     setTimeout(() => {
         t.classList.add('show');
-        t.style.transform = `translateY(${offset}px)`;
+        t.style.transform = `translateY(${offset}px) scale(1)`;
+        t.style.opacity = '1';
     }, 10);
+    
+    // Auto-remove after delay
     setTimeout(() => {
         t.classList.remove('show');
-        setTimeout(() => t.remove(), 400);
+        t.classList.add('hiding');
+        setTimeout(() => {
+            t.remove();
+            // Update positions of remaining toasts
+            $$('#toast-container .toast').forEach((toast, idx) => {
+                toast.style.transform = `translateY(${idx * 90}px) scale(1)`;
+            });
+        }, 500);
     }, 3000);
 };
 
@@ -732,7 +1018,6 @@ if (unlockTrigger && unlockStatus) {
             setTimeout(() => {
                 document.body.classList.add('unlocked');
                 $('#disguise').style.display = 'none';
-                initBackground();
                 bindHover();
                 updateClock();
                 cursor.style.display = 'block';
@@ -762,25 +1047,23 @@ let PROXIES = loadData('proxies', [
     ]}
 ]);
 
-// ALL GAMES INCLUDING NEW ONES
+// NEW GAMES FROM PROVIDED CODE
 let GAMES = loadData('games', [
-    {id:'car-survival', icon:'🚗', name:'Car Survival 3D', cat:'Action', url:'Crush_Cars_3D.html'},
-    {id:'draw-joust', icon:'⚔️', name:'Draw Joust', cat:'Action', url:'Draw_Joust.html'},
-    {id:'gun-runner', icon:'🔫', name:'Gun Runner', cat:'Action', url:'Gun_Runner.html'},
-    {id:'minecraft', icon:'⛏️', name:'Minecraft 1.12.2', cat:'Sandbox', url:'Minecraft_1_12_2.html'},
-    {id:'angry-birds', icon:'🐦', name:'Angry Birds', cat:'Puzzle', url:'Angry_Birds.html'},
-    {id:'code-editor', icon:'💻', name:'Code Editor', cat:'Tools', url:'Code_Editor.html'},
-    {id:'fnae', icon:'👹', name:'Five Nights at Epstein', cat:'Horror', url:'Five_Nights_at_Epstein_s.html'},
-    {id:'geometry-dash', icon:'🔺', name:'Geometry Dash Lite', cat:'Rhythm', url:'Geometry_Dash_Lite__REMAKE_.html'},
-    {id:'build-plane', icon:'✈️', name:'Build a Plane', cat:'Adventure', url:'https://rawcdn.githack.com/genizy/brainrot/main/build-a-plane/index.html'},
+    {id:'geometry-dash', icon:'🔺', name:'Geometry Dash', cat:'Rhythm', url:'https://rawcdn.githack.com/genizy/google-class/main/gdlite/index.html'},
+    {id:'draw-joust', icon:'⚔️', name:'Draw Joust', cat:'Action', url:'https://rawcdn.githack.com/genizy/brainrot/main/draw-joust/index.html'},
+    {id:'code-editor', icon:'💻', name:'Code Editor', cat:'Tools', url:'https://rawcdn.githack.com/genizy/code-editor/main/index.html'},
+    {id:'angry-birds', icon:'🐦', name:'Angry Birds', cat:'Puzzle', url:'https://rawcdn.githack.com/gertdoro/UnityExplorer/cffa09e09790018403c996d37adb6c4450e8f6c6/Runtime/birds/birds.html'},
+    {id:'car-survival', icon:'🚗', name:'Car Survival 3D', cat:'Action', url:'https://rawcdn.githack.com/genizy/brainrot/main/car-survival-3d/index.html'},
+    {id:'city-defense', icon:'🏰', name:'City Defense 3D', cat:'Strategy', url:'https://rawcdn.githack.com/genizy/brainrot/main/city-defense/index.html'},
     {id:'build-army', icon:'🪖', name:'Build a Big Army!', cat:'Strategy', url:'https://rawcdn.githack.com/genizy/brainrot/main/build-a-big-army/index.html'},
-    {id:'city-defense', icon:'🏰', name:'City Defense 3D', cat:'Strategy', url:'https://rawcdn.githack.com/genizy/brainrot/main/city-defense/index.html'}
+    {id:'soundboard', icon:'🔊', name:'Soundboard', cat:'Tools', url:'https://rawcdn.githack.com/genizy/soundboard/main/index.html'},
+    {id:'fork-sausage', icon:'🍴', name:'Fork N Sausage', cat:'Action', url:'https://rawcdn.githack.com/bubbls/youtube-playables/main/fork-n-sausage/index.html'}
 ]);
 
 let INSTALLED_APPS = loadData('installed_apps', []);
 
 const UPDATES = [
-    {version: '2.3', date: '2024', title: 'Pointer Cursor & UX Update', desc: 'New pointer cursor that changes with themes, fixed text overflow in installers, added 8 new games'},
+    {version: '2.3', date: '2024', title: 'Peak Logo & Game Update', desc: 'Added mountain logo as A in PEAK background, replaced all games with working versions'},
     {version: '2.2', date: '2024', title: 'Cursor & Installer Update', desc: 'Enhanced cursor accuracy, added proxy/game installers'},
     {version: '2.1', date: '2024', title: 'Loading Screen & Updates', desc: 'Added loading screen, updates app, and stacked notifications'}
 ];
@@ -809,10 +1092,10 @@ if (startBtn && mountainSearchContainer) {
         if (!isMountainSearchVisible) {
             mountainSearchContainer.style.display = 'block';
             mountainSearchContainer.style.opacity = '0';
-            mountainSearchContainer.style.transform = 'scale(0.9)';
+            mountainSearchContainer.style.transform = 'scale(0.8) translateY(20px)';
             setTimeout(() => {
                 mountainSearchContainer.style.opacity = '1';
-                mountainSearchContainer.style.transform = 'scale(1)';
+                mountainSearchContainer.style.transform = 'scale(1) translateY(0)';
                 mountainSearchInput.focus();
             }, 10);
             startMenu.classList.remove('show');
@@ -900,7 +1183,13 @@ if (mountainSearchInput) {
 function closeStartMenu() {
     isMountainSearchVisible = false;
     if (startMenu) startMenu.classList.remove('show');
-    if (mountainSearchContainer) mountainSearchContainer.style.display = 'none';
+    if (mountainSearchContainer) {
+        mountainSearchContainer.style.opacity = '0';
+        mountainSearchContainer.style.transform = 'scale(0.8) translateY(20px)';
+        setTimeout(() => {
+            mountainSearchContainer.style.display = 'none';
+        }, 300);
+    }
 }
 
 document.addEventListener('click', (e) => {
@@ -1122,11 +1411,11 @@ function createDesktopIcon(type, data) {
     icon.dataset.id = data.id;
     icon.innerHTML = `
         <div class="desktop-icon-img">
-            <div style="font-size: 40px;">${data.icon}</div>
+            <div style="font-size: 32px;">${data.icon}</div>
         </div>
         <div class="desktop-icon-label">${data.name}</div>
     `;
-    icon.addEventListener('dblclick', () => {
+    icon.addEventListener('click', () => {
         if (type === 'proxy') {
             openProxyUrl(data.name, data.icon, data.links[0].u);
         } else if (type === 'game') {
@@ -1499,8 +1788,9 @@ const openGame = (game, newWindow = false) => {
     openProxyUrl(game.name, game.icon, game.url);
 };
 
+// Change to single click for apps
 $$('.desktop-icon[data-app]').forEach(icon => {
-    icon.addEventListener('dblclick', () => {
+    icon.addEventListener('click', () => {
         if (document.body.classList.contains('unlocked')) {
             openApp(icon.dataset.app);
         }
@@ -1566,42 +1856,6 @@ document.addEventListener('keydown', e => {
         closeAllWindows();
     }
 });
-
-function initBackground() {
-    if (settings.performance) return;
-    const canvas = $('#bg-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let w, h;
-    const resize = () => {
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = window.innerHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-    const particles = Array.from({length: 30}, () => ({
-        x: Math.random() * w, y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.2, vy: (Math.random() - 0.5) * 0.2,
-        r: Math.random() * 1.5 + 0.5,
-        color: `rgba(0,212,255,${0.2 + Math.random() * 0.3})`
-    }));
-    const animate = () => {
-        if (settings.performance) return;
-        ctx.clearRect(0, 0, w, h);
-        particles.forEach(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            if (p.x < 0 || p.x > w) p.vx *= -1;
-            if (p.y < 0 || p.y > h) p.vy *= -1;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fillStyle = p.color;
-            ctx.fill();
-        });
-        requestAnimationFrame(animate);
-    };
-    animate();
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     initLoadingScreen();
