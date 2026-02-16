@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Peak Hub - Ultimate Edition</title>
+<title>Peak Hub - Ultimate Edition V2</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 10 L70 50 L90 90 L10 90 L30 50 Z' fill='%2300d4ff'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;600;700&family=Fira+Code&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#0a0e27;--bg2:#151b3d;--bg3:#1e2749;--acc:#00d4ff;--txt:#e8eaf0;--txt2:#8b93b8;--border:rgba(255,255,255,.08);--border-acc:rgba(0,212,255,.4);--glow:rgba(0,212,255,.2);--cursor-color:#00d4ff}
@@ -15,10 +16,13 @@ body.theme-neon{--bg:#000814;--acc:#ff00ff;--glow:rgba(255,0,255,.2);--cursor-co
 body.theme-aurora{--bg:#0a1a2d;--acc:#00ffaa;--glow:rgba(0,255,170,.2);--cursor-color:#00ffaa}
 body.theme-sunset{--bg:#1a0e1a;--acc:#ff6b35;--glow:rgba(255,107,53,.2);--cursor-color:#ff6b35}
 body.theme-cyber{--bg:#0d0d1a;--acc:#00ffff;--glow:rgba(0,255,255,.2);--cursor-color:#00ffff}
+body.theme-matrix{--bg:#001100;--acc:#00ff00;--glow:rgba(0,255,0,.2);--cursor-color:#00ff00}
+body.theme-retro{--bg:#008080;--acc:#c0c0c0;--glow:rgba(192,192,192,.2);--cursor-color:#c0c0c0}
 html,body{width:100%;height:100vh;font-family:Inter,sans-serif;overflow:hidden}
 body{background:var(--bg);color:var(--txt);transition:background .3s}
 body,body *{cursor:none!important;user-select:none}
 body.logged-in #os{opacity:1;pointer-events:auto}
+body.sounds-on .grid-btn:hover,body.sounds-on .desktop-icon:hover{transition:all .3s, transform .1s}
 #loading-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--bg),var(--bg3));z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s}
 #loading-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
 .loading-logo{width:200px;height:200px;margin-bottom:50px;animation:float 3s ease-in-out infinite}
@@ -82,6 +86,7 @@ body.logged-in #login-screen{display:none}
 #desktop-bg.bg-sunset{background:linear-gradient(135deg,#1a0e1a 0%,#3d2340 50%,#ff6b35 100%)}
 #desktop-bg.bg-matrix{background:#001100;background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,0,.04) 2px,rgba(0,255,0,.04) 4px)}
 #desktop-bg.bg-neon{background:#000;background-image:radial-gradient(circle,rgba(255,0,255,.2) 2px,transparent 2px);background-size:60px 60px}
+#desktop-bg.bg-custom{background-size:cover;background-position:center}
 .peak-logo-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.05;pointer-events:none}
 .peak-logo-text{font-family:Orbitron,sans-serif;font-size:18vw;font-weight:900;color:var(--acc);text-shadow:0 0 100px var(--glow)}
 #desktop{position:relative;z-index:2;flex:1;padding:30px;overflow:hidden;display:grid;grid-template-columns:1fr 360px;gap:30px}
@@ -92,7 +97,6 @@ body.logged-in #login-screen{display:none}
 .desktop-icon:hover{background:rgba(255,255,255,.18);border-color:var(--border-acc);transform:translateY(-10px) scale(1.12);box-shadow:0 25px 70px rgba(0,0,0,.8),0 0 40px var(--glow)}
 .desktop-icon-img{width:52px;height:52px;display:flex;align-items:center;justify-content:center;font-size:42px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
 .desktop-icon-label{font-size:12px;color:var(--txt);text-align:center;font-weight:700;padding:6px 10px;border-radius:10px;background:rgba(0,0,0,.7);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;backdrop-filter:blur(15px);box-shadow:0 2px 10px rgba(0,0,0,.5)}
-/* hideable sidebar toggle button */
 .sidebar-toggle{position:absolute;top:40px;right:40px;z-index:20;width:48px;height:48px;border-radius:50%;background:var(--bg3);border:2px solid var(--border-acc);color:var(--acc);font-size:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;box-shadow:0 8px 28px rgba(0,0,0,.6)}
 .sidebar-toggle:hover{transform:scale(1.2);background:var(--acc);color:var(--bg);box-shadow:0 0 40px var(--glow)}
 .desktop-widgets{display:flex;flex-direction:column;gap:24px}
@@ -111,10 +115,10 @@ body.logged-in #login-screen{display:none}
 .monitor-item:hover{background:rgba(255,255,255,.08);border-color:var(--border-acc);transform:translateX(6px);box-shadow:0 4px 15px rgba(0,0,0,.4)}
 .monitor-label{color:var(--txt2);font-weight:600}
 .monitor-value{color:var(--acc);font-weight:700;font-family:'Fira Code',monospace;text-shadow:0 0 10px var(--glow)}
-.window{position:absolute;background:var(--bg2);border:2px solid var(--border-acc);border-radius:24px;box-shadow:0 50px 120px rgba(0,0,0,.9),0 0 80px var(--glow);display:flex;flex-direction:column;opacity:0;pointer-events:none;min-width:650px;min-height:550px;overflow:hidden;transition:all .3s;backdrop-filter:blur(35px)}
+.window{position:absolute;background:var(--bg2);border:2px solid var(--border-acc);border-radius:24px;box-shadow:0 50px 120px rgba(0,0,0,.9),0 0 80px var(--glow);display:flex;flex-direction:column;opacity:0;pointer-events:none;min-width:650px;min-height:550px;overflow:hidden;transition:all .3s;backdrop-filter:blur(35px);resize:both}
 .window.show{opacity:1;pointer-events:auto;z-index:100;animation:windowAppear .6s cubic-bezier(.34,1.56,.64,1)}
 @keyframes windowAppear{0%{opacity:0;transform:scale(.88) translateY(70px)}100%{opacity:1;transform:scale(1) translateY(0)}}
-.window.maximized{top:0!important;left:0!important;right:0!important;bottom:80px!important;width:100%!important;height:calc(100% - 80px)!important;border-radius:0}
+.window.maximized{top:0!important;left:0!important;right:0!important;bottom:80px!important;width:100%!important;height:calc(100% - 80px)!important;border-radius:0;resize:none}
 .window.minimized{opacity:0;pointer-events:none;transform:scale(0.7) translateY(150px)}
 .window-titlebar{display:flex;align-items:center;gap:14px;padding:16px 22px;background:linear-gradient(135deg,var(--bg3),var(--bg2));border-bottom:2px solid var(--border-acc);cursor:move;user-select:none;box-shadow:0 3px 12px rgba(0,0,0,.4)}
 .window-title{flex:1;font-size:16px;font-weight:700;color:var(--txt);text-shadow:0 1px 3px rgba(0,0,0,.6)}
@@ -124,7 +128,7 @@ body.logged-in #login-screen{display:none}
 .window-btn.close:hover{background:#ef4444;color:#fff;border-color:#ef4444;box-shadow:0 8px 28px rgba(239,68,68,.7)}
 .tab-content{display:none;flex:1;overflow:hidden;position:relative}
 .tab-content.active{display:flex;flex-direction:column}
-.content-grid{flex:1;overflow-y:auto;padding:32px}
+.content-grid{flex:1;overflow-y:auto;padding:32px;max-height:100%}
 .content-grid::-webkit-scrollbar{width:12px}
 .content-grid::-webkit-scrollbar-thumb{background:var(--border-acc);border-radius:10px;border:2px solid var(--bg2)}
 .content-grid::-webkit-scrollbar-track{background:var(--bg3)}
@@ -169,6 +173,18 @@ body.logged-in #login-screen{display:none}
 .start-btn{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--acc),rgba(0,212,255,.9));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .4s;box-shadow:0 12px 45px var(--glow)}
 .start-btn:hover{transform:scale(1.3) rotate(30deg);box-shadow:0 20px 70px var(--glow)}
 .start-btn svg{width:36px;height:36px}
+.taskbar-search{flex:1;max-width:400px;position:relative}
+.taskbar-search input{width:100%;background:var(--bg3);border:2px solid var(--border);border-radius:16px;padding:16px 50px 16px 20px;color:var(--txt);font-size:15px;font-weight:600;transition:all .3s}
+.taskbar-search input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 4px var(--glow)}
+.taskbar-search-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:var(--txt2);font-size:20px}
+.search-results{position:absolute;bottom:calc(100% + 10px);left:0;right:0;background:rgba(21,27,61,.98);border:2px solid var(--border-acc);border-radius:18px;max-height:400px;overflow-y:auto;opacity:0;pointer-events:none;transform:translateY(20px);transition:all .3s;box-shadow:0 -20px 60px rgba(0,0,0,.9);backdrop-filter:blur(35px)}
+.search-results.show{opacity:1;pointer-events:auto;transform:translateY(0)}
+.search-result-item{padding:16px 20px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:16px;transition:all .3s}
+.search-result-item:hover{background:var(--glow)}
+.search-result-icon{font-size:32px}
+.search-result-info{flex:1}
+.search-result-name{font-size:16px;font-weight:700;color:var(--txt)}
+.search-result-desc{font-size:13px;color:var(--txt2);margin-top:4px}
 .taskbar-windows{display:flex;gap:10px;flex:1;overflow-x:auto;padding:0 14px}
 .taskbar-windows::-webkit-scrollbar{height:8px}
 .taskbar-windows::-webkit-scrollbar-thumb{background:var(--border-acc);border-radius:10px;border:2px solid var(--bg2)}
@@ -183,8 +199,6 @@ body.logged-in #login-screen{display:none}
 .taskbar-end{display:flex;align-items:center;gap:18px;margin-left:auto}
 .taskbar-clock{padding:14px 28px;text-align:center;cursor:pointer;border-radius:16px;transition:all .3s;background:var(--bg3);border:2px solid var(--border);box-shadow:0 6px 20px rgba(0,0,0,.4)}
 .taskbar-clock:hover{background:rgba(255,255,255,.15);transform:translateY(-8px);box-shadow:0 14px 45px rgba(0,0,0,.7);border-color:var(--border-acc)}
-.clock-time{font-size:18px;font-weight:700;font-family:Orbitron,monospace;letter-spacing:2px}
-.clock-date{font-size:12px;color:var(--txt2);margin-top:5px;font-weight:700}
 #toast-container{position:fixed;top:35px;right:35px;z-index:9999;display:flex;flex-direction:column;gap:18px;pointer-events:none}
 .toast{background:rgba(21,27,61,.98);border:2px solid var(--border-acc);border-radius:18px;padding:22px 26px;min-width:360px;display:flex;gap:18px;transform:translateX(600px);transition:all .7s cubic-bezier(.68,-.55,.265,1.55);opacity:0;box-shadow:0 50px 120px rgba(0,0,0,.9),0 0 80px var(--glow);backdrop-filter:blur(35px);pointer-events:auto}
 .toast.show{transform:translateX(0);opacity:1}
@@ -199,6 +213,30 @@ body.logged-in #login-screen{display:none}
 .color-swatch{width:100%;aspect-ratio:1;border-radius:14px;cursor:pointer;border:4px solid transparent;transition:all .3s;box-shadow:0 8px 24px rgba(0,0,0,.6)}
 .color-swatch:hover{transform:scale(1.25) rotate(8deg);box-shadow:0 14px 40px rgba(0,0,0,.8)}
 .color-swatch.active{border-color:#fff;box-shadow:0 0 40px currentColor,0 14px 50px rgba(0,0,0,.9);transform:scale(1.2)}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:20px}
+.calendar-day{aspect-ratio:1;background:var(--bg3);border:2px solid var(--border);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;position:relative}
+.calendar-day:hover{background:rgba(255,255,255,.15);border-color:var(--border-acc);transform:scale(1.05)}
+.calendar-day.today{border-color:var(--acc);background:var(--glow)}
+.calendar-day.has-event::after{content:'';position:absolute;bottom:8px;width:6px;height:6px;background:var(--acc);border-radius:50%;box-shadow:0 0 10px var(--acc)}
+.todo-item{display:flex;align-items:center;gap:16px;padding:16px;background:var(--bg3);border:2px solid var(--border);border-radius:14px;margin-bottom:12px;transition:all .3s}
+.todo-item:hover{border-color:var(--border-acc);transform:translateX(6px)}
+.todo-checkbox{width:24px;height:24px;border:2px solid var(--border);border-radius:6px;cursor:pointer;transition:all .3s}
+.todo-checkbox.checked{background:var(--acc);border-color:var(--acc);box-shadow:0 0 15px var(--glow)}
+.todo-text{flex:1;color:var(--txt);font-size:15px;font-weight:600}
+.todo-text.completed{text-decoration:line-through;opacity:.5}
+.pomodoro-timer{text-align:center}
+.pomodoro-display{font-size:72px;font-weight:900;font-family:Orbitron,monospace;color:var(--acc);text-shadow:0 0 40px var(--glow);margin:30px 0}
+.pomodoro-controls{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.achievement-badge{display:flex;align-items:center;gap:16px;padding:20px;background:var(--bg3);border:2px solid var(--border-acc);border-radius:16px;margin-bottom:16px}
+.achievement-badge.unlocked{background:linear-gradient(135deg,var(--glow),var(--bg3));box-shadow:0 8px 28px var(--glow)}
+.achievement-icon{font-size:48px}
+.achievement-info{flex:1}
+.achievement-name{font-size:18px;font-weight:700;color:var(--txt)}
+.achievement-desc{font-size:14px;color:var(--txt2);margin-top:4px}
+.achievement-locked{opacity:.5}
+.pet-container{position:fixed;bottom:100px;right:100px;z-index:199;width:150px;height:150px;pointer-events:none}
+.pet{font-size:100px;animation:petBounce 2s infinite;filter:drop-shadow(0 0 20px var(--glow))}
+@keyframes petBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
 </style>
 </head>
 <body class="theme-midnight">
@@ -268,9 +306,9 @@ body.logged-in #login-screen{display:none}
 <div class="quick-btn" onclick="openApp('hub')"><div>🏔️</div><div class="quick-btn-label">Hub</div></div>
 <div class="quick-btn" onclick="openApp('styles')"><div>🎨</div><div class="quick-btn-label">Styles</div></div>
 <div class="quick-btn" onclick="openTool('browser')"><div>🌍</div><div class="quick-btn-label">Browser</div></div>
-<div class="quick-btn" onclick="openTool('notes')"><div>📝</div><div class="quick-btn-label">Notes</div></div>
-<div class="quick-btn" onclick="openTool('music')"><div>🎵</div><div class="quick-btn-label">Music</div></div>
-<div class="quick-btn" onclick="openTool('calculator')"><div>🔢</div><div class="quick-btn-label">Calc</div></div>
+<div class="quick-btn" onclick="openTool('calendar')"><div>📅</div><div class="quick-btn-label">Calendar</div></div>
+<div class="quick-btn" onclick="openTool('todo')"><div>✓</div><div class="quick-btn-label">To-Do</div></div>
+<div class="quick-btn" onclick="openTool('pomodoro')"><div>⏱️</div><div class="quick-btn-label">Timer</div></div>
 </div>
 </div>
 <div class="widget">
@@ -278,7 +316,7 @@ body.logged-in #login-screen{display:none}
 <div class="system-monitor">
 <div class="monitor-item"><span class="monitor-label">Apps Installed</span><span class="monitor-value" id="apps-count">0</span></div>
 <div class="monitor-item"><span class="monitor-label">Windows Open</span><span class="monitor-value" id="windows-count">0</span></div>
-<div class="monitor-item"><span class="monitor-label">Active Theme</span><span class="monitor-value" id="theme-name">Midnight</span></div>
+<div class="monitor-item"><span class="monitor-label">Achievements</span><span class="monitor-value" id="achievements-count">0/10</span></div>
 </div>
 </div>
 </div>
@@ -298,6 +336,9 @@ body.logged-in #login-screen{display:none}
 <div class="qs-tile" onclick="toggleQS('wifi')"><div class="qs-tile-icon">📶</div><div class="qs-tile-label">WiFi</div></div>
 <div class="qs-tile" onclick="toggleQS('airplane')"><div class="qs-tile-icon">✈️</div><div class="qs-tile-label">Airplane</div></div>
 <div class="qs-tile" onclick="toggleQS('bt')"><div class="qs-tile-icon">📡</div><div class="qs-tile-label">Bluetooth</div></div>
+<div class="qs-tile" onclick="toggleQS('sounds')" id="sounds-toggle"><div class="qs-tile-icon">🔊</div><div class="qs-tile-label">Sounds</div></div>
+<div class="qs-tile" onclick="openTool('screenshot')"><div class="qs-tile-icon">📸</div><div class="qs-tile-label">Screenshot</div></div>
+<div class="qs-tile" onclick="openTool('pet')"><div class="qs-tile-icon">🐱</div><div class="qs-tile-label">Pet</div></div>
 </div>
 <div class="qs-slider">
 <div class="qs-slider-label"><span>🔊 Volume</span><span id="vol-val">50%</span></div>
@@ -311,9 +352,14 @@ body.logged-in #login-screen{display:none}
 
 <div id="taskbar">
 <div class="taskbar-start">
-<button class="start-btn" id="start-btn" title="Peak Hub">
+<button class="start-btn" id="start-btn" title="Quick Search">
 <svg viewBox="0 0 100 100"><path d="M 50 10 L 70 50 L 90 90 L 10 90 L 30 50 Z" fill="currentColor"/><path d="M 50 10 L 60 30 L 50 35 L 40 30 Z" fill="#fff"/></svg>
 </button>
+</div>
+<div class="taskbar-search">
+<input type="text" id="search-input" placeholder="Search apps, games, or web...">
+<div class="taskbar-search-icon">🔍</div>
+<div class="search-results" id="search-results"></div>
 </div>
 <div class="taskbar-windows" id="taskbar-windows"></div>
 <div class="taskbar-end">
@@ -326,13 +372,16 @@ body.logged-in #login-screen{display:none}
 </div>
 
 <div id="toast-container"></div>
+<div class="pet-container" id="pet-container" style="display:none">
+<div class="pet">🐱</div>
+</div>
 
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const loadData=(k,d)=>{try{return JSON.parse(localStorage.getItem('ph-'+k)||JSON.stringify(d))}catch{return d}};
 const saveData=(k,d)=>localStorage.setItem('ph-'+k,JSON.stringify(d));
 
-let settings=loadData('settings',{theme:'midnight',bg:'gradient',cursor:'#00d4ff',sidebarHidden:false}),currentUser=null,unlockClicks=0,windows=[],winId=0,activeWin=null,contextTarget=null;
+let settings=loadData('settings',{theme:'midnight',bg:'gradient',cursor:'#00d4ff',sidebarHidden:false,soundsEnabled:false,customBg:null}),currentUser=null,unlockClicks=0,windows=[],winId=0,activeWin=null,contextTarget=null;
 
 const TOOLS=[
 {id:'notes',icon:'📝',name:'Notes',cat:'Productivity'},
@@ -343,7 +392,14 @@ const TOOLS=[
 {id:'sysinfo',icon:'💻',name:'System Info',cat:'System'},
 {id:'settings',icon:'⚙️',name:'Settings',cat:'System'},
 {id:'terminal',icon:'⌨️',name:'Terminal',cat:'Developer'},
-{id:'paint',icon:'🎨',name:'Paint',cat:'Creative'}
+{id:'paint',icon:'🎨',name:'Paint',cat:'Creative'},
+{id:'calendar',icon:'📅',name:'Calendar',cat:'Productivity'},
+{id:'todo',icon:'✓',name:'To-Do List',cat:'Productivity'},
+{id:'pomodoro',icon:'⏱️',name:'Pomodoro Timer',cat:'Productivity'},
+{id:'screenshot',icon:'📸',name:'Screenshot Tool',cat:'Tools'},
+{id:'bookmarks',icon:'🔖',name:'Bookmarks',cat:'Internet'},
+{id:'weather',icon:'☀️',name:'Weather',cat:'Information'},
+{id:'achievements',icon:'🏆',name:'Achievements',cat:'System'}
 ];
 
 const GAMES=[
@@ -375,27 +431,106 @@ const PROXIES=[
 {id:'void',name:'Void',icon:'🌌',links:[{t:'Link 1',u:'https://edu.ucecom-craiova.ro'}]}
 ];
 
-let INSTALLED=loadData('installed',[]);
+const ACHIEVEMENTS=[
+{id:'first-login',name:'Welcome Aboard',desc:'Login for the first time',icon:'👋',unlocked:false},
+{id:'install-10',name:'App Collector',desc:'Install 10 apps',icon:'📦',unlocked:false},
+{id:'all-themes',name:'Theme Master',desc:'Try all color themes',icon:'🎨',unlocked:false},
+{id:'pomodoro-10',name:'Focus Master',desc:'Complete 10 Pomodoro sessions',icon:'⏱️',unlocked:false},
+{id:'todo-50',name:'Task Champion',desc:'Complete 50 to-do items',icon:'✓',unlocked:false},
+{id:'play-all-games',name:'Gamer Supreme',desc:'Play all games',icon:'🎮',unlocked:false},
+{id:'screenshot-master',name:'Snapshot Pro',desc:'Take 25 screenshots',icon:'📸',unlocked:false},
+{id:'konami-code',name:'Secret Finder',desc:'Enter the Konami Code',icon:'🎮',unlocked:false},
+{id:'customize-bg',name:'Personal Touch',desc:'Upload custom background',icon:'🖼️',unlocked:false},
+{id:'productivity-king',name:'Productivity King',desc:'Use all productivity tools',icon:'👑',unlocked:false}
+];
 
-// AUTO-INSTALL SETTINGS - PROTECTED
+let INSTALLED=loadData('installed',[]);
+let ACHIEVEMENTS_DATA=loadData('achievements',ACHIEVEMENTS);
+let BOOKMARKS=loadData('bookmarks',[]);
+let TODO_LIST=loadData('todos',[]);
+let CALENDAR_EVENTS=loadData('events',{});
+let POMODORO_COUNT=loadData('pomodoro-count',0);
+let SCREENSHOT_COUNT=loadData('screenshot-count',0);
+let THEMES_TRIED=loadData('themes-tried',[]);
+
+// AUTO-INSTALL SETTINGS
 if(!loadData('firstRun',false)){
 INSTALLED.push({id:'settings',icon:'⚙️',name:'Settings',type:'tool',protected:true});
 saveData('installed',INSTALLED);
 saveData('firstRun',true);
+checkAchievement('first-login');
 }
+
+// SOUND EFFECTS
+const playSound=(type)=>{
+if(!settings.soundsEnabled)return;
+const ctx=new(window.AudioContext||window.webkitAudioContext)();
+const osc=ctx.createOscillator();
+const gain=ctx.createGain();
+osc.connect(gain);
+gain.connect(ctx.destination);
+if(type==='click'){osc.frequency.value=800;gain.gain.value=0.1;osc.start();osc.stop(ctx.currentTime+0.05)}
+else if(type==='open'){osc.frequency.value=600;gain.gain.value=0.15;osc.start();osc.stop(ctx.currentTime+0.1)}
+else if(type==='close'){osc.frequency.value=400;gain.gain.value=0.15;osc.start();osc.stop(ctx.currentTime+0.1)}
+else if(type==='achievement'){osc.frequency.value=1000;gain.gain.value=0.2;osc.start();osc.stop(ctx.currentTime+0.2)}
+};
 
 const toast=(t,m,type='success')=>{
 let c=$('#toast-container');
 if(!c){c=document.createElement('div');c.id='toast-container';document.body.appendChild(c)}
 const el=document.createElement('div');
 el.className=`toast ${type}`;
-el.innerHTML=`<div class="toast-icon">${type==='success'?'✓':'✕'}</div><div><div class="toast-title">${t}</div><div class="toast-msg">${m}</div></div>`;
+el.innerHTML=`<div class="toast-icon">${type==='success'?'✓':type==='achievement'?'🏆':'✕'}</div><div><div class="toast-title">${t}</div><div class="toast-msg">${m}</div></div>`;
 c.appendChild(el);
+if(type==='achievement')playSound('achievement');
 setTimeout(()=>el.classList.add('show'),10);
 setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),600)},4000);
 };
 
-// CUSTOM CURSOR - FIXED
+function checkAchievement(id){
+const ach=ACHIEVEMENTS_DATA.find(a=>a.id===id);
+if(ach&&!ach.unlocked){
+ach.unlocked=true;
+saveData('achievements',ACHIEVEMENTS_DATA);
+toast('Achievement Unlocked! 🏆',ach.name,'achievement');
+updateWidgets();
+}
+}
+
+// KEYBOARD SHORTCUTS
+document.addEventListener('keydown',e=>{
+if(!document.body.classList.contains('logged-in'))return;
+// Alt+F4 - Close active window
+if(e.altKey&&e.key==='F4'){e.preventDefault();if(activeWin)closeWin(activeWin)}
+// Win+D - Minimize all
+if(e.metaKey&&e.key==='d'){e.preventDefault();windows.forEach(w=>minWin(w.id))}
+// Ctrl+Alt+T - Terminal
+if(e.ctrlKey&&e.altKey&&e.key==='t'){e.preventDefault();openTool('terminal')}
+// Win+L - Logout
+if(e.metaKey&&e.key==='l'){e.preventDefault();window.logout()}
+// Ctrl+F - Focus search
+if(e.ctrlKey&&e.key==='f'){e.preventDefault();$('#search-input').focus()}
+// Konami Code
+const konamiCode=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+if(!window.konamiProgress)window.konamiProgress=0;
+if(e.key===konamiCode[window.konamiProgress]){
+window.konamiProgress++;
+if(window.konamiProgress===konamiCode.length){
+activateSecretTheme();
+checkAchievement('konami-code');
+window.konamiProgress=0;
+}
+}else{window.konamiProgress=0}
+});
+
+function activateSecretTheme(){
+settings.theme='matrix';
+settings.bg='matrix';
+applySettings();
+toast('Secret Unlocked! 🎮','Matrix Theme Activated!','achievement');
+}
+
+// CUSTOM CURSOR
 const cursor=$('#cursor');
 document.addEventListener('mousemove',e=>{
 if(document.body.classList.contains('logged-in')){
@@ -403,7 +538,7 @@ cursor.style.left=e.clientX+'px';
 cursor.style.top=e.clientY+'px';
 }
 });
-document.addEventListener('mousedown',()=>cursor.classList.add('click'));
+document.addEventListener('mousedown',()=>{cursor.classList.add('click');playSound('click')});
 document.addEventListener('mouseup',()=>cursor.classList.remove('click'));
 
 const bindHover=()=>{
@@ -421,7 +556,55 @@ $('#unlock-status').textContent=unlockClicks>=3?'✓ Unlocked!':`Click ${3-unloc
 if(unlockClicks>=3){$('#disguise').classList.add('hide');setTimeout(()=>{$('#disguise').style.display='none';$('#login-screen').classList.add('show')},500)}
 });
 
-// APP LOADER FUNCTION
+// SEARCH FUNCTIONALITY
+const searchInput=$('#search-input');
+const searchResults=$('#search-results');
+let searchTimeout;
+
+searchInput.addEventListener('input',e=>{
+clearTimeout(searchTimeout);
+const query=e.target.value.trim().toLowerCase();
+if(!query){searchResults.classList.remove('show');return}
+searchTimeout=setTimeout(()=>{
+const allItems=[...INSTALLED,...GAMES.filter(g=>!INSTALLED.find(i=>i.id===g.id)),...TOOLS.filter(t=>!INSTALLED.find(i=>i.id===t.id))];
+const results=allItems.filter(item=>item.name.toLowerCase().includes(query)||item.cat?.toLowerCase().includes(query)).slice(0,8);
+if(results.length===0&&query.includes('.')){
+results.push({id:'web-search',icon:'🌐',name:`Search: ${query}`,cat:'Web Search',isWeb:true,query});
+}
+searchResults.innerHTML=results.map(r=>`<div class="search-result-item" data-id="${r.id}" data-type="${r.type||'unknown'}" data-isweb="${r.isWeb||false}"><div class="search-result-icon">${r.icon}</div><div class="search-result-info"><div class="search-result-name">${r.name}</div><div class="search-result-desc">${r.cat||''}</div></div></div>`).join('');
+searchResults.classList.add('show');
+$$('.search-result-item').forEach(item=>{
+item.addEventListener('click',()=>{
+const id=item.dataset.id;
+const type=item.dataset.type;
+const isWeb=item.dataset.isweb==='true';
+searchResults.classList.remove('show');
+searchInput.value='';
+if(isWeb){
+openTool('browser');
+setTimeout(()=>{
+const urlInput=$('#proxy-url');
+if(urlInput){urlInput.value=query;loadProxyUrl()}
+},500);
+}else if(type==='game'){
+const game=GAMES.find(g=>g.id===id);
+if(game)launchGame(game);
+}else if(type==='tool'){openTool(id)}
+else if(id==='hub')openApp('hub');
+else if(id==='styles')openApp('styles');
+});
+});
+},300);
+});
+
+document.addEventListener('click',e=>{
+if(!e.target.closest('.taskbar-search'))searchResults.classList.remove('show');
+});
+
+$('#start-btn').addEventListener('click',()=>{
+$('#search-input').focus();
+});
+
 function showAppLoader(container){
 const loader=document.createElement('div');
 loader.className='app-loader';
@@ -431,8 +614,11 @@ return loader;
 }
 
 function createWin(title,icon,type,onReady){
-const existing=windows.find(w=>w.type===type&&!w.min);
+// Prevent multiple Peak Hub windows
+if(type==='hub'){
+const existing=windows.find(w=>w.type==='hub');
 if(existing){restoreWin(existing.id);focusWin(existing.id);return existing.id}
+}
 const id=`win-${winId++}`;
 const win=document.createElement('div');
 win.className='window';
@@ -444,13 +630,14 @@ win.style.height='650px';
 win.innerHTML=`<div class="window-titlebar"><div class="window-title">${icon} ${title}</div><div class="window-controls"><button class="window-btn minimize" title="Minimize">−</button><button class="window-btn maximize" title="Maximize">□</button><button class="window-btn close" title="Close">✕</button></div></div><div class="tab-content active" id="content-${id}"></div>`;
 $('#windows-container').appendChild(win);
 if(typeof interact!=='undefined'){interact(win).draggable({allowFrom:'.window-titlebar',listeners:{move(e){const t=e.target;t.style.left=`${parseFloat(t.style.left)+e.dx}px`;t.style.top=`${parseFloat(t.style.top)+e.dy}px`}}})}
-win.querySelector('.close').addEventListener('click',()=>closeWin(id));
+win.querySelector('.close').addEventListener('click',()=>{closeWin(id);playSound('close')});
 win.querySelector('.minimize').addEventListener('click',()=>minWin(id));
 win.querySelector('.maximize').addEventListener('click',()=>toggleMax(id));
 win.addEventListener('mousedown',()=>focusWin(id));
 windows.push({id,title,icon,type,min:false});
 const content=$(`#content-${id}`);
 const loader=showAppLoader(content);
+playSound('open');
 setTimeout(()=>{
 win.classList.add('show');
 focusWin(id);
@@ -498,7 +685,6 @@ activeWin=id;
 updateTaskbar();
 }
 
-// ENHANCED TASKBAR WITH CLOSE BUTTONS
 function updateTaskbar(){
 const c=$('#taskbar-windows');
 if(!c)return;
@@ -516,14 +702,25 @@ const time=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
 const date=now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 $$('.clock-time').forEach(el=>el.textContent=time);
 $$('.clock-date').forEach(el=>el.textContent=date);
-if($('#widget-time'))$('#widget-time').textContent=time;
-if($('#widget-date'))$('#widget-date').textContent=date;
 }
 
 function updateWidgets(){
 if($('#apps-count'))$('#apps-count').textContent=INSTALLED.length;
 if($('#windows-count'))$('#windows-count').textContent=windows.length;
-if($('#theme-name'))$('#theme-name').textContent=settings.theme.charAt(0).toUpperCase()+settings.theme.slice(1);
+if($('#achievements-count')){
+const unlocked=ACHIEVEMENTS_DATA.filter(a=>a.unlocked).length;
+$('#achievements-count').textContent=`${unlocked}/${ACHIEVEMENTS_DATA.length}`;
+}
+// Check achievements
+if(INSTALLED.length>=10)checkAchievement('install-10');
+if(THEMES_TRIED.length>=7)checkAchievement('all-themes');
+if(POMODORO_COUNT>=10)checkAchievement('pomodoro-10');
+if(TODO_LIST.filter(t=>t.completed).length>=50)checkAchievement('todo-50');
+if(SCREENSHOT_COUNT>=25)checkAchievement('screenshot-master');
+const playedGames=INSTALLED.filter(i=>i.type==='game').length;
+if(playedGames>=GAMES.length)checkAchievement('play-all-games');
+const prodTools=['calendar','todo','pomodoro','notes'];
+if(prodTools.every(t=>INSTALLED.find(i=>i.id===t)))checkAchievement('productivity-king');
 }
 
 setInterval(updateClock,1000);
@@ -627,7 +824,6 @@ toast('Deleted! 🗑️',`"${contextTarget.name}" removed`);
 });
 });
 
-// SIDEBAR TOGGLE
 const sidebarToggle=$('#sidebarToggle');
 function updateSidebar(){
 const desktop=$('#desktop');
@@ -650,7 +846,6 @@ bindHover();
 updateClock();
 updateSidebar();
 renderDesktop();
-$('#start-btn').addEventListener('click',()=>openApp('hub'));
 $('#taskbar-clock').addEventListener('click',()=>$('#quick-settings').classList.toggle('show'));
 document.addEventListener('click',e=>{if(!e.target.closest('#quick-settings')&&!e.target.closest('#taskbar-clock'))$('#quick-settings').classList.remove('show')});
 $('#vol-slider').addEventListener('input',e=>$('#vol-val').textContent=e.target.value+'%');
@@ -660,19 +855,38 @@ toast('Welcome! 🎉',`Welcome back, ${currentUser.username}!`);
 }
 
 function applySettings(){
-document.body.className=document.body.className.replace(/theme-\w+/g,'');
+document.body.className=document.body.className.replace(/theme-\w+/g,'').replace(/sounds-\w+/g,'');
 document.body.classList.add(`theme-${settings.theme}`,'logged-in');
+if(settings.soundsEnabled)document.body.classList.add('sounds-on');
+if(settings.customBg){
+$('#desktop-bg').className='bg-custom';
+$('#desktop-bg').style.backgroundImage=`url(${settings.customBg})`;
+}else{
 $('#desktop-bg').className=`bg-${settings.bg}`;
+$('#desktop-bg').style.backgroundImage='';
+}
 document.documentElement.style.setProperty('--cursor-color',settings.cursor);
 updateSidebar();
 saveData('settings',settings);
 updateWidgets();
+if(!THEMES_TRIED.includes(settings.theme)){
+THEMES_TRIED.push(settings.theme);
+saveData('themes-tried',THEMES_TRIED);
+}
 }
 
 window.toggleQS=(type)=>{
+if(type==='sounds'){
+settings.soundsEnabled=!settings.soundsEnabled;
+saveData('settings',settings);
+applySettings();
+$('#sounds-toggle').classList.toggle('active',settings.soundsEnabled);
+toast('Sound Effects',`Sounds ${settings.soundsEnabled?'enabled':'disabled'}`);
+}else{
 event.currentTarget.classList.toggle('active');
 const active=event.currentTarget.classList.contains('active');
 toast(type.toUpperCase(),`${type.charAt(0).toUpperCase()+type.slice(1)} ${active?'enabled':'disabled'}`);
+}
 };
 
 function openApp(id){
@@ -680,16 +894,15 @@ if(id==='hub')openHub();
 else if(id==='styles')openStyles();
 }
 
-
 function openHub(){
 createWin('Peak Hub','🏔️','hub',content=>{
 content.innerHTML=`
 <div style="display:flex;height:100%">
-<div style="width:240px;background:var(--bg3);border-right:2px solid var(--border-acc);padding:28px;display:flex;flex-direction:column">
+<div style="width:240px;background:var(--bg3);border-right:2px solid var(--border-acc);padding:28px;display:flex;flex-direction:column;overflow-y:auto">
 <div style="margin-bottom:45px;text-align:center">
 <svg viewBox="0 0 100 100" style="width:80px;height:80px;filter:drop-shadow(0 0 25px var(--glow))"><path d="M 50 10 L 70 50 L 90 90 L 10 90 L 30 50 Z" fill="currentColor"/><path d="M 50 10 L 60 30 L 50 35 L 40 30 Z" fill="#fff"/></svg>
 <div style="font-family:Orbitron,sans-serif;font-size:22px;font-weight:900;color:var(--acc);margin-top:14px;text-shadow:0 0 15px var(--glow)">PEAK HUB</div>
-<div style="font-size:11px;color:var(--txt2);margin-top:5px;font-weight:600;text-transform:uppercase;letter-spacing:2px">Ultimate Edition</div>
+<div style="font-size:11px;color:var(--txt2);margin-top:5px;font-weight:600;text-transform:uppercase;letter-spacing:2px">Ultimate Edition V2</div>
 </div>
 <div style="display:flex;flex-direction:column;gap:14px">
 <button class="grid-btn nav-btn active" onclick="switchTab('games')">🎮 Games</button>
@@ -698,7 +911,7 @@ content.innerHTML=`
 <button class="grid-btn nav-btn" onclick="switchTab('installed')">📦 Installed</button>
 </div>
 </div>
-<div style="flex:1;display:flex;flex-direction:column">
+<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
 <div class="hub-tab active" id="tab-games"><div class="content-grid"><div style="margin-bottom:35px"><div class="grid-title">Games Library</div><div class="grid-subtitle">${GAMES.length} games available • Install to play</div></div><div class="item-grid">${GAMES.map(g=>{
 const inst=INSTALLED.find(a=>a.id===g.id);
 return `<div class="item-card"><div class="item-header"><div class="item-icon">${g.icon}</div><div style="flex:1"><div class="item-name">${g.name}</div><div class="item-desc">${g.cat}</div></div></div><div class="item-actions">${inst?`<button class="grid-btn success" onclick='launchGame(${JSON.stringify(g)})'>🎮 Play Now</button><button class="grid-btn danger" onclick='uninstallApp("${g.id}")'>🗑️ Remove</button>`:`<button class="grid-btn primary" onclick='installGame(${JSON.stringify(g)})'>📥 Install Game</button>`}</div></div>`;
@@ -733,13 +946,15 @@ createWin('Styles','🎨','styles',content=>{
 content.innerHTML=`
 <div class="content-grid">
 <div style="margin-bottom:45px"><div class="grid-title">Appearance Settings</div><div class="grid-subtitle">Customize Peak Hub to match your personal style</div></div>
-<div style="margin-bottom:45px"><h3 style="font-size:20px;font-weight:700;margin-bottom:24px;color:var(--acc);text-shadow:0 0 15px var(--glow)">🎨 Color Themes</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px">${['midnight','neon','aurora','sunset','cyber'].map(t=>{
+<div style="margin-bottom:45px"><h3 style="font-size:20px;font-weight:700;margin-bottom:24px;color:var(--acc);text-shadow:0 0 15px var(--glow)">🎨 Color Themes</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px">${['midnight','neon','aurora','sunset','cyber','matrix','retro'].map(t=>{
 let bg='';
 if(t==='midnight')bg='linear-gradient(135deg,#0a0e27,#1e2749)';
 else if(t==='neon')bg='linear-gradient(135deg,#000814,#001845,#ff00ff)';
 else if(t==='aurora')bg='linear-gradient(135deg,#0a1a2d,#1f3a6d,#00ffaa)';
 else if(t==='sunset')bg='linear-gradient(135deg,#1a0e1a,#3d2340,#ff6b35)';
 else if(t==='cyber')bg='linear-gradient(135deg,#0d0d1a,#27274d,#00ffff)';
+else if(t==='matrix')bg='linear-gradient(135deg,#001100,#003300)';
+else if(t==='retro')bg='linear-gradient(135deg,#008080,#20b2aa)';
 return `<div class="item-card ${settings.theme===t?'active':''}" onclick='changeTheme("${t}")' style="aspect-ratio:16/9;padding:0;position:relative;overflow:hidden;cursor:pointer;border-width:3px"><div style="width:100%;height:100%;background:${bg}"></div><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.95);padding:16px;font-size:14px;font-weight:700;text-align:center;backdrop-filter:blur(15px)">${t.charAt(0).toUpperCase()+t.slice(1)}${settings.theme===t?' ✓':''}</div></div>`;
 }).join('')}</div></div>
 <div style="margin-bottom:45px"><h3 style="font-size:20px;font-weight:700;margin-bottom:24px;color:var(--acc);text-shadow:0 0 15px var(--glow)">🖼️ Desktop Backgrounds</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px">${['gradient','stars','waves','aurora','sunset','matrix','neon'].map(b=>{
@@ -751,221 +966,96 @@ else if(b==='aurora')bg='linear-gradient(135deg,#0a1a2d,#1f3a6d,#00ffaa)';
 else if(b==='sunset')bg='linear-gradient(135deg,#1a0e1a,#3d2340,#ff6b35)';
 else if(b==='matrix')bg='#001100';
 else if(b==='neon')bg='#000';
-return `<div class="item-card ${settings.bg===b?'active':''}" onclick='changeBg("${b}")' style="aspect-ratio:16/9;padding:0;position:relative;overflow:hidden;cursor:pointer;border-width:3px"><div style="width:100%;height:100%;background:${bg}"></div><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.95);padding:16px;font-size:14px;font-weight:700;text-align:center;backdrop-filter:blur(15px)">${b.charAt(0).toUpperCase()+b.slice(1)}${settings.bg===b?' ✓':''}</div></div>`;
-}).join('')}</div></div>
+return `<div class="item-card ${settings.bg===b&&!settings.customBg?'active':''}" onclick='changeBg("${b}")' style="aspect-ratio:16/9;padding:0;position:relative;overflow:hidden;cursor:pointer;border-width:3px"><div style="width:100%;height:100%;background:${bg}"></div><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.95);padding:16px;font-size:14px;font-weight:700;text-align:center;backdrop-filter:blur(15px)">${b.charAt(0).toUpperCase()+b.slice(1)}${settings.bg===b&&!settings.customBg?' ✓':''}</div></div>`;
+}).join('')}<div class="item-card ${settings.customBg?'active':''}" style="aspect-ratio:16/9;padding:0;position:relative;overflow:hidden;cursor:pointer;border-width:3px"><input type="file" id="bg-upload" accept="image/*" style="display:none"><div onclick="document.getElementById('bg-upload').click()" style="width:100%;height:100%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:48px">📤</div><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.95);padding:16px;font-size:14px;font-weight:700;text-align:center;backdrop-filter:blur(15px)">Upload Custom${settings.customBg?' ✓':''}</div></div></div></div>
 <div><h3 style="font-size:20px;font-weight:700;margin-bottom:24px;color:var(--acc);text-shadow:0 0 15px var(--glow)">🖱️ Cursor Color</h3><div class="color-picker">${['#00d4ff','#ff00ff','#00ffaa','#ff6b35','#00ffff','#ff0000','#00ff00','#ffff00','#ff69b4','#9370ff','#ffd700','#fff'].map(c=>`<div class="color-swatch ${settings.cursor===c?'active':''}" style="background:${c}" onclick='changeCursor("${c}")'></div>`).join('')}</div></div>
 </div>`;
+if($('#bg-upload')){
+$('#bg-upload').addEventListener('change',e=>{
+const file=e.target.files[0];
+if(file){
+const reader=new FileReader();
+reader.onload=ev=>{
+settings.customBg=ev.target.result;
+settings.bg='custom';
+applySettings();
+checkAchievement('customize-bg');
+toast('Background Updated! 🖼️','Custom background applied');
+};
+reader.readAsDataURL(file);
+}
+});
+}
 bindHover();
 });
 }
 
 window.switchTab=tab=>{$$('.nav-btn').forEach(b=>b.classList.remove('active'));$$('.hub-tab').forEach(t=>t.classList.remove('active'));event.target.classList.add('active');$(`#tab-${tab}`).classList.add('active')};
-
-window.installGame=g=>{if(INSTALLED.find(a=>a.id===g.id)){toast('Already Installed! ⚠️',`${g.name} is already installed`,'error');return}INSTALLED.push({...g,type:'game'});saveData('installed',INSTALLED);toast('Installed! 🎉',`${g.name} is ready to play`);renderDesktop();refreshHub()};
-
-window.installProxy=p=>{if(INSTALLED.find(a=>a.id===p.id)){toast('Already Installed! ⚠️',`${p.name} is already installed`,'error');return}INSTALLED.push(p);saveData('installed',INSTALLED);toast('Installed! 🎉',`${p.name} is ready to use`);renderDesktop();refreshHub()};
-
-window.installTool=t=>{if(INSTALLED.find(a=>a.id===t.id)){toast('Already Installed! ⚠️',`${t.name} is already installed`,'error');return}INSTALLED.push({...t,type:'tool'});saveData('installed',INSTALLED);toast('Installed! 🎉',`${t.name} is ready to use`);renderDesktop();refreshHub()};
-
-window.uninstallApp=id=>{const app=INSTALLED.find(a=>a.id===id);if(!app)return;if(app.protected){toast('Cannot Delete! 🔒','This app is protected and cannot be removed','error');return}INSTALLED=INSTALLED.filter(a=>a.id!==id);saveData('installed',INSTALLED);toast('Uninstalled! 🗑️',`${app.name} has been removed`);renderDesktop();refreshHub()};
-
-window.uninstallAll=()=>{const unprotected=INSTALLED.filter(a=>!a.protected);if(unprotected.length===0){toast('Nothing to Remove! ⚠️','All apps are protected','error');return}if(confirm(`Uninstall ${unprotected.length} app${unprotected.length===1?'':'s'}?`)){INSTALLED=INSTALLED.filter(a=>a.protected);saveData('installed',INSTALLED);toast('All Uninstalled! 🗑️','Unprotected apps removed');renderDesktop();refreshHub()}};
-
+window.installGame=g=>{if(INSTALLED.find(a=>a.id===g.id)){toast('Already Installed! ⚠️',`${g.name} is already installed`,'error');return}INSTALLED.push({...g,type:'game'});saveData('installed',INSTALLED);toast('Installed! 🎉',`${g.name} is ready to play`);renderDesktop();refreshHub();updateWidgets()};
+window.installProxy=p=>{if(INSTALLED.find(a=>a.id===p.id)){toast('Already Installed! ⚠️',`${p.name} is already installed`,'error');return}INSTALLED.push(p);saveData('installed',INSTALLED);toast('Installed! 🎉',`${p.name} is ready to use`);renderDesktop();refreshHub();updateWidgets()};
+window.installTool=t=>{if(INSTALLED.find(a=>a.id===t.id)){toast('Already Installed! ⚠️',`${t.name} is already installed`,'error');return}INSTALLED.push({...t,type:'tool'});saveData('installed',INSTALLED);toast('Installed! 🎉',`${t.name} is ready to use`);renderDesktop();refreshHub();updateWidgets()};
+window.uninstallApp=id=>{const app=INSTALLED.find(a=>a.id===id);if(!app)return;if(app.protected){toast('Cannot Delete! 🔒','This app is protected and cannot be removed','error');return}INSTALLED=INSTALLED.filter(a=>a.id!==id);saveData('installed',INSTALLED);toast('Uninstalled! 🗑️',`${app.name} has been removed`);renderDesktop();refreshHub();updateWidgets()};
+window.uninstallAll=()=>{const unprotected=INSTALLED.filter(a=>!a.protected);if(unprotected.length===0){toast('Nothing to Remove! ⚠️','All apps are protected','error');return}if(confirm(`Uninstall ${unprotected.length} app${unprotected.length===1?'':'s'}?`)){INSTALLED=INSTALLED.filter(a=>a.protected);saveData('installed',INSTALLED);toast('All Uninstalled! 🗑️','Unprotected apps removed');renderDesktop();refreshHub();updateWidgets()}};
 function refreshHub(){const hw=windows.find(w=>w.type==='hub');if(hw){const tab=$$('.hub-tab.active')[0];if(tab&&tab.id==='tab-installed'){const content=$('#installed-content');if(content)content.innerHTML=renderInstalled()}}}
-
-window.launchGame=g=>createWin(g.name,g.icon,`game-${g.id}`,c=>c.innerHTML=`<iframe src="${g.url}" style="width:100%;height:100%;border:none;background:#000"></iframe>`);
-
+window.launchGame=g=>createWin(g.name,g.icon,`game-${g.id}`,c=>c.innerHTML=`<iframe src="${g.url}" style="width:100%;height:100%;border:none;background:#000" allow="fullscreen"></iframe>`);
 window.launchProxy=p=>createWin(p.name,p.icon,`proxy-${p.id}`,c=>c.innerHTML=`<iframe src="${p.url}" style="width:100%;height:100%;border:none;background:#000"></iframe>`);
 
-// SCRAMJET PROXY BROWSER + ALL TOOLS
+// ALL TOOLS
 window.openTool=id=>{
-if(id==='browser')createWin('Browser','🌍','browser',c=>{
-c.innerHTML=`<div style="display:flex;flex-direction:column;height:100%"><div style="padding:18px;background:var(--bg3);border-bottom:2px solid var(--border-acc);display:flex;gap:14px;align-items:center"><button class="grid-btn" onclick="document.getElementById('proxy-frame').contentWindow.history.back()" title="Back">←</button><button class="grid-btn" onclick="document.getElementById('proxy-frame').contentWindow.history.forward()" title="Forward">→</button><button class="grid-btn" onclick="loadProxyUrl(true)" title="Reload">↻</button><input type="text" id="proxy-url" placeholder="Enter URL or search..." value="" style="flex:1;background:var(--bg);border:2px solid var(--border);border-radius:12px;padding:14px 18px;color:var(--txt);font-size:15px;font-weight:600"><button class="grid-btn primary" onclick="loadProxyUrl()">Go</button></div><iframe id="proxy-frame" style="flex:1;border:none;background:#fff"></iframe></div>`;
-const urlInput=$('#proxy-url');
-urlInput.addEventListener('keypress',e=>{if(e.key==='Enter')loadProxyUrl()});
-setTimeout(()=>{urlInput.value='https://google.com';loadProxyUrl()},200);
-bindHover();
-});
-else if(id==='notes')createWin('Notes','📝','notes',c=>{
-const notes=loadData('notes',[]);
-c.innerHTML=`<div style="display:flex;height:100%"><div style="width:300px;background:var(--bg3);border-right:2px solid var(--border-acc);padding:28px;display:flex;flex-direction:column"><button class="grid-btn primary" style="width:100%;margin-bottom:28px;font-size:15px" onclick="createNote()">📝 New Note</button><div id="notes-list" style="display:flex;flex-direction:column;gap:14px;flex:1;overflow-y:auto">${notes.map((n,i)=>`<div class="item-card" style="padding:18px;cursor:pointer" onclick="loadNote(${i})"><div style="font-size:15px;font-weight:700;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${n.title||'Untitled Note'}</div><div style="font-size:12px;color:var(--txt2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${n.content.substring(0,60)}...</div></div>`).join('')}</div></div><div style="flex:1;padding:32px;display:flex;flex-direction:column"><input id="note-title" placeholder="Note title..." style="background:var(--bg3);border:2px solid var(--border);border-radius:14px;padding:20px;font-size:22px;font-weight:700;color:var(--txt);margin-bottom:22px"><textarea id="note-content" placeholder="Start typing your note..." style="flex:1;background:var(--bg3);border:2px solid var(--border);border-radius:14px;padding:20px;color:var(--txt);resize:none;font-size:16px;line-height:1.8"></textarea><button class="grid-btn primary" style="margin-top:22px;font-size:16px" onclick="saveNote()">💾 Save Note</button></div></div>`;
-bindHover();
-});
-else if(id==='calculator')createWin('Calculator','🔢','calculator',c=>{
-c.innerHTML=`<div style="display:flex;flex-direction:column;height:100%;background:var(--bg);padding:32px"><div id="calc-display" style="background:var(--bg3);border-radius:18px;padding:36px;margin-bottom:28px;text-align:right;font-size:52px;font-family:'Fira Code',monospace;color:var(--txt);min-height:110px;display:flex;align-items:center;justify-content:flex-end;border:2px solid var(--border-acc);box-shadow:0 10px 30px rgba(0,0,0,.5)">0</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;flex:1">${['C','←','%','÷','7','8','9','×','4','5','6','-','1','2','3','+','0','.','='].map(btn=>`<button class="grid-btn${btn==='='?' primary':''}" style="font-size:26px;min-height:75px;font-weight:800${btn==='='?';grid-column:span 2':''}" onclick="calcBtn('${btn}')">${btn}</button>`).join('')}</div></div>`;
-bindHover();
-});
-else if(id==='music')createWin('Music Player','🎵','music',c=>{
-c.innerHTML=`<div style="height:100%;display:flex;flex-direction:column;background:var(--bg)"><div style="flex:1;padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center"><iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?theme=0" width="100%" height="520" frameborder="0" allow="encrypted-media" style="border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.7)"></iframe></div><div style="padding:32px;border-top:2px solid var(--border-acc);text-align:center;background:var(--bg3)"><div style="color:var(--txt);font-size:18px;font-weight:700;margin-bottom:10px">🎵 Spotify Web Player</div><div style="color:var(--txt2);font-size:14px;font-weight:600">Use the controls above to browse and play music</div></div></div>`;
-});
-else if(id==='files')createWin('File Manager','📁','files',c=>{
-c.innerHTML=`<div class="content-grid"><div style="margin-bottom:35px"><div class="grid-title">File Manager</div><div class="grid-subtitle">Organize and manage your files</div></div><div style="padding:120px;text-align:center;color:var(--txt2)"><div style="font-size:90px;margin-bottom:28px;filter:drop-shadow(0 0 20px rgba(0,0,0,.6))">📁</div><div style="font-size:22px;font-weight:700;margin-bottom:14px">No Files Yet</div><div style="font-size:16px;line-height:1.6">File management features coming soon!</div></div></div>`;
-});
-else if(id==='sysinfo')createWin('System Info','💻','sysinfo',c=>{
-const info={
-'Operating System':'Peak Hub Ultimate Edition',
-'Browser':navigator.userAgent.split(')')[0]+')',
-'Language':navigator.language,
-'Platform':navigator.platform,
-'Online Status':navigator.onLine?'✓ Connected':'✗ Offline',
-'Cookies':navigator.cookieEnabled?'✓ Enabled':'✗ Disabled',
-'Screen Resolution':`${screen.width} × ${screen.height}`,
-'Color Depth':`${screen.colorDepth}-bit`,
-'Current Theme':settings.theme.charAt(0).toUpperCase()+settings.theme.slice(1),
-'Background Style':settings.bg.charAt(0).toUpperCase()+settings.bg.slice(1),
-'Apps Installed':INSTALLED.length,
-'Windows Open':windows.length,
-'Local Storage':Object.keys(localStorage).length+' items'
-};
-c.innerHTML=`<div class="content-grid"><div style="margin-bottom:35px"><div class="grid-title">System Information</div><div class="grid-subtitle">Detailed system statistics and configuration</div></div><div style="background:var(--bg3);padding:32px;border-radius:20px;font-family:'Fira Code',monospace;font-size:15px;border:2px solid var(--border-acc);box-shadow:0 10px 35px rgba(0,0,0,.5)">${Object.entries(info).map(([k,v])=>`<div style="margin-bottom:18px;display:flex;justify-content:space-between;padding-bottom:18px;border-bottom:2px solid var(--border)"><span style="color:var(--acc);font-weight:700;text-shadow:0 0 10px var(--glow)">${k}</span><span style="color:var(--txt);font-weight:600">${v}</span></div>`).join('')}</div></div>`;
-});
-else if(id==='settings')createWin('Settings','⚙️','settings',c=>{
-c.innerHTML=`<div class="content-grid"><div style="margin-bottom:35px"><div class="grid-title">Settings</div><div class="grid-subtitle">Configure Peak Hub system settings</div></div><div style="display:flex;flex-direction:column;gap:28px"><div style="background:var(--bg3);padding:32px;border-radius:20px;border:2px solid var(--border-acc);box-shadow:0 8px 28px rgba(0,0,0,.5)"><h3 style="font-size:20px;margin-bottom:24px;color:var(--acc);font-weight:700;text-shadow:0 0 15px var(--glow)">👤 User Account</h3><p style="font-size:16px;margin-bottom:10px">Username: <strong style="color:var(--acc)">${currentUser.username}</strong></p><p style="font-size:14px;color:var(--txt2);font-weight:600">Status: <span style="color:#10b981">● Active & Online</span></p></div><div style="background:var(--bg3);padding:32px;border-radius:20px;border:2px solid var(--border-acc);box-shadow:0 8px 28px rgba(0,0,0,.5)"><h3 style="font-size:20px;margin-bottom:24px;color:var(--acc);font-weight:700;text-shadow:0 0 15px var(--glow)">💾 Storage & System</h3><p style="font-size:16px;margin-bottom:14px">Apps Installed: <strong style="color:var(--acc)">${INSTALLED.length}</strong></p><p style="font-size:16px;margin-bottom:14px">Windows Open: <strong style="color:var(--acc)">${windows.length}</strong></p><p style="font-size:16px;margin-bottom:14px">Active Theme: <strong style="color:var(--acc)">${settings.theme}</strong></p><p style="font-size:16px">Background: <strong style="color:var(--acc)">${settings.bg}</strong></p></div><div style="background:var(--bg3);padding:32px;border-radius:20px;border:2px solid var(--border-acc);box-shadow:0 8px 28px rgba(0,0,0,.5)"><h3 style="font-size:20px;margin-bottom:24px;color:var(--acc);font-weight:700;text-shadow:0 0 15px var(--glow)">⚡ System Actions</h3><button class="grid-btn danger" style="width:100%;margin-bottom:14px;font-size:16px" onclick="if(confirm('⚠️ Reset all data and settings? This CANNOT be undone!')){localStorage.clear();location.reload()}">🔄 Reset All Data</button><button class="grid-btn" style="width:100%;font-size:16px" onclick="window.logout()">🔓 Logout from Peak Hub</button></div></div></div>`;
-bindHover();
-});
-else if(id==='terminal')createWin('Terminal','⌨️','terminal',c=>{
-c.innerHTML=`<div style="height:100%;display:flex;flex-direction:column;background:#000;padding:20px;font-family:'Fira Code',monospace"><div id="terminal-output" style="flex:1;overflow-y:auto;color:#0f0;font-size:14px;line-height:1.6"></div><div style="display:flex;gap:10px;margin-top:10px"><span style="color:#0f0">$</span><input type="text" id="terminal-input" placeholder="Type 'help' for commands..." style="flex:1;background:transparent;border:none;color:#0f0;font-family:'Fira Code',monospace;font-size:14px;outline:none"></div></div>`;
-const output=$('#terminal-output');
-const input=$('#terminal-input');
-const commands={'help':'Available: help, clear, date, sysinfo, echo','clear':'','date':new Date().toString(),'sysinfo':`Peak Hub v1.0\\nApps: ${INSTALLED.length}\\nTheme: ${settings.theme}`};
-output.innerHTML='<div>Peak Hub Terminal v1.0</div><div>Type "help" for available commands</div><div>---</div>';
-input.addEventListener('keypress',e=>{
-if(e.key==='Enter'){
-const cmd=input.value.trim();
-output.innerHTML+=`<div style="margin-top:10px">$ ${cmd}</div>`;
-if(cmd==='clear')output.innerHTML='';
-else if(cmd.startsWith('echo '))output.innerHTML+=`<div>${cmd.substring(5)}</div>`;
-else output.innerHTML+=`<div>${commands[cmd]||'Command not found: '+cmd}</div>`;
-input.value='';
-output.scrollTop=output.scrollHeight;
-}
-});
-});
-else if(id==='paint')createWin('Paint','🎨','paint',c=>{
-c.innerHTML=`<div style="height:100%;display:flex;flex-direction:column"><div style="padding:14px;background:var(--bg3);border-bottom:2px solid var(--border-acc);display:flex;gap:10px"><input type="color" id="paint-color" value="#00d4ff" style="width:50px;height:40px;border:none;border-radius:8px;cursor:pointer"><button class="grid-btn" onclick="document.getElementById('paint-canvas').getContext('2d').clearRect(0,0,9999,9999)">Clear</button><input type="range" id="paint-size" min="1" max="50" value="5" style="width:150px"></div><canvas id="paint-canvas" style="flex:1;background:#fff;cursor:crosshair"></canvas></div>`;
-const canvas=$('#paint-canvas');
-const ctx=canvas.getContext('2d');
-canvas.width=canvas.offsetWidth;
-canvas.height=canvas.offsetHeight;
-let painting=false;
-canvas.addEventListener('mousedown',()=>painting=true);
-canvas.addEventListener('mouseup',()=>painting=false);
-canvas.addEventListener('mousemove',e=>{
-if(!painting)return;
-const rect=canvas.getBoundingClientRect();
-const x=e.clientX-rect.left;
-const y=e.clientY-rect.top;
-ctx.fillStyle=$('#paint-color').value;
-ctx.beginPath();
-ctx.arc(x,y,$('#paint-size').value,0,Math.PI*2);
-ctx.fill();
-});
-});
+if(id==='browser')createWin('Browser','🌍','browser',c=>{c.innerHTML=`<div style="display:flex;flex-direction:column;height:100%"><div style="padding:18px;background:var(--bg3);border-bottom:2px solid var(--border-acc);display:flex;gap:14px;align-items:center"><button class="grid-btn" onclick="document.getElementById('proxy-frame').contentWindow.history.back()" title="Back">←</button><button class="grid-btn" onclick="document.getElementById('proxy-frame').contentWindow.history.forward()" title="Forward">→</button><button class="grid-btn" onclick="loadProxyUrl(true)" title="Reload">↻</button><input type="text" id="proxy-url" placeholder="Enter URL or search..." value="" style="flex:1;background:var(--bg);border:2px solid var(--border);border-radius:12px;padding:14px 18px;color:var(--txt);font-size:15px;font-weight:600"><button class="grid-btn primary" onclick="loadProxyUrl()">Go</button></div><iframe id="proxy-frame" style="flex:1;border:none;background:#fff"></iframe></div>`;const urlInput=$('#proxy-url');urlInput.addEventListener('keypress',e=>{if(e.key==='Enter')loadProxyUrl()});setTimeout(()=>{urlInput.value='https://google.com';loadProxyUrl()},200);bindHover()});
+else if(id==='notes')createWin('Notes','📝','notes',c=>{const notes=loadData('notes',[]);c.innerHTML=`<div style="display:flex;height:100%"><div style="width:300px;background:var(--bg3);border-right:2px solid var(--border-acc);padding:28px;display:flex;flex-direction:column"><button class="grid-btn primary" style="width:100%;margin-bottom:28px;font-size:15px" onclick="createNote()">📝 New Note</button><div id="notes-list" style="display:flex;flex-direction:column;gap:14px;flex:1;overflow-y:auto">${notes.map((n,i)=>`<div class="item-card" style="padding:18px;cursor:pointer" onclick="loadNote(${i})"><div style="font-size:15px;font-weight:700;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${n.title||'Untitled Note'}</div><div style="font-size:12px;color:var(--txt2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${n.content.substring(0,60)}...</div></div>`).join('')}</div></div><div style="flex:1;padding:32px;display:flex;flex-direction:column"><input id="note-title" placeholder="Note title..." style="background:var(--bg3);border:2px solid var(--border);border-radius:14px;padding:20px;font-size:22px;font-weight:700;color:var(--txt);margin-bottom:22px"><textarea id="note-content" placeholder="Start typing your note..." style="flex:1;background:var(--bg3);border:2px solid var(--border);border-radius:14px;padding:20px;color:var(--txt);resize:none;font-size:16px;line-height:1.8"></textarea><button class="grid-btn primary" style="margin-top:22px;font-size:16px" onclick="saveNote()">💾 Save Note</button></div></div>`;bindHover()});
+else if(id==='calculator')createWin('Calculator','🔢','calculator',c=>{c.innerHTML=`<div style="display:flex;flex-direction:column;height:100%;background:var(--bg);padding:32px"><div id="calc-display" style="background:var(--bg3);border-radius:18px;padding:36px;margin-bottom:28px;text-align:right;font-size:52px;font-family:'Fira Code',monospace;color:var(--txt);min-height:110px;display:flex;align-items:center;justify-content:flex-end;border:2px solid var(--border-acc);box-shadow:0 10px 30px rgba(0,0,0,.5)">0</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;flex:1">${['C','←','%','÷','7','8','9','×','4','5','6','-','1','2','3','+','0','.','='].map(btn=>`<button class="grid-btn${btn==='='?' primary':''}" style="font-size:26px;min-height:75px;font-weight:800${btn==='='?';grid-column:span 2':''}" onclick="calcBtn('${btn}')">${btn}</button>`).join('')}</div></div>`;bindHover()});
+else if(id==='music')createWin('Music Player','🎵','music',c=>{c.innerHTML=`<div style="height:100%;display:flex;flex-direction:column;background:var(--bg)"><div style="flex:1;padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center"><iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?theme=0" width="100%" height="520" frameborder="0" allow="encrypted-media" style="border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.7)"></iframe></div><div style="padding:32px;border-top:2px solid var(--border-acc);text-align:center;background:var(--bg3)"><div style="color:var(--txt);font-size:18px;font-weight:700;margin-bottom:10px">🎵 Spotify Web Player</div><div style="color:var(--txt2);font-size:14px;font-weight:600">Use the controls above to browse and play music</div></div></div>`});
+else if(id==='calendar')createWin('Calendar','📅','calendar',c=>{const now=new Date();const year=now.getFullYear();const month=now.getMonth();const daysInMonth=new Date(year,month+1,0).getDate();const firstDay=new Date(year,month,1).getDay();const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];let calendarHTML='<div class="content-grid"><div style="margin-bottom:35px"><div class="grid-title">Calendar & Events</div><div class="grid-subtitle">'+now.toLocaleDateString('en-US',{month:'long',year:'numeric'})+'</div></div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:20px">'+days.map(d=>`<div style="text-align:center;font-weight:700;color:var(--acc)">${d}</div>`).join('')+'</div><div class="calendar-grid">';for(let i=0;i<firstDay;i++)calendarHTML+='<div></div>';for(let d=1;d<=daysInMonth;d++){const dateKey=`${year}-${month}-${d}`;const hasEvent=CALENDAR_EVENTS[dateKey];const isToday=d===now.getDate();calendarHTML+=`<div class="calendar-day ${isToday?'today':''} ${hasEvent?'has-event':''}" onclick="addEvent('${dateKey}')">${d}</div>`}calendarHTML+='</div><button class="grid-btn primary" style="margin-top:30px" onclick="addEvent()">➕ Add Event</button></div>';c.innerHTML=calendarHTML;bindHover()});
+else if(id==='todo')createWin('To-Do List','✓','todo',c=>{c.innerHTML=`<div class="content-grid"><div style="margin-bottom:35px"><div class="grid-title">To-Do List</div><div class="grid-subtitle">${TODO_LIST.filter(t=>!t.completed).length} active task${TODO_LIST.filter(t=>!t.completed).length===1?'':'s'}</div></div><div style="display:flex;gap:14px;margin-bottom:30px"><input type="text" id="new-todo" placeholder="Add a new task..." style="flex:1;background:var(--bg3);border:2px solid var(--border);border-radius:14px;padding:16px 20px;color:var(--txt);font-size:15px;font-weight:600"><button class="grid-btn primary" onclick="addTodo()">➕ Add</button></div><div id="todo-list">${renderTodos()}</div></div>`;$('#new-todo').addEventListener('keypress',e=>{if(e.key==='Enter')addTodo()});bindHover()});
+else if(id==='pomodoro')createWin('Pomodoro Timer','⏱️','pomodoro',c=>{c.innerHTML=`<div class="content-grid"><div class="pomodoro-timer"><div class="grid-title">Pomodoro Timer</div><div class="grid-subtitle">Focus with 25-minute work sessions</div><div class="pomodoro-display" id="pomo-display">25:00</div><div class="pomodoro-controls"><button class="grid-btn primary" onclick="startPomodoro()">▶ Start Session</button><button class="grid-btn" onclick="resetPomodoro()">↻ Reset</button><button class="grid-btn" onclick="skipPomodoro()">⏭ Skip</button></div><div style="margin-top:40px;text-align:center"><div style="font-size:18px;color:var(--txt2);font-weight:600">Sessions Completed Today: <span style="color:var(--acc);font-size:24px;font-weight:900">${POMODORO_COUNT}</span></div></div></div></div>`;bindHover()});
+else if(id==='screenshot')createWin('Screenshot Tool','📸','screenshot',c=>{c.innerHTML=`<div class="content-grid"><div style="text-align:center;padding:60px"><div class="grid-title">Screenshot Tool</div><div class="grid-subtitle">Capture your desktop</div><button class="grid-btn primary" style="margin:30px auto;font-size:18px" onclick="takeScreenshot()">📸 Take Screenshot</button><div style="margin-top:30px;color:var(--txt2)"><div style="margin-bottom:12px">✓ Full desktop capture</div><div style="margin-bottom:12px">✓ Download as PNG</div><div>✓ One-click copy to clipboard</div></div><div style="margin-top:40px;font-size:14px;color:var(--txt2)">Screenshots taken: <span style="color:var(--acc);font-size:18px;font-weight:700">${SCREENSHOT_COUNT}</span></div></div></div>`;bindHover()});
+else if(id==='bookmarks')createWin('Bookmarks','🔖','bookmarks',c=>{c.innerHTML=`<div class="content-grid"><div style="margin-bottom:35px"><div class="grid-title">Bookmarks Manager</div><div class="grid-subtitle">${BOOKMARKS.length} saved website${BOOKMARKS.length===1?'':'s'}</div></div><div style="display:flex;gap:14px;margin-bottom:30px"><input type="text" id="bookmark-url" placeholder="Enter URL..." style="flex:1;background:var(--bg3);border:2px solid var(--border);border-radius:14px;padding:16px 20px;color:var(--txt);font-size:15px;font-weight:600"><input type="text" id="bookmark-name" placeholder="Name..." style="width:200px;background:var(--bg3);border:2px solid var(--border);border-radius:14px;padding:16px 20px;color:var(--txt);font-size:15px;font-weight:600"><button class="grid-btn primary" onclick="addBookmark()">🔖 Save</button></div><div class="item-grid" id="bookmarks-list">${renderBookmarks()}</div></div>`;bindHover()});
+else if(id==='weather')createWin('Weather','☀️','weather',c=>{c.innerHTML=`<div class="content-grid"><div style="text-align:center;padding:60px"><div class="grid-title">Weather Widget</div><div class="grid-subtitle">Check current conditions</div><div style="margin:40px 0;font-size:120px">☀️</div><div style="font-size:48px;font-weight:900;color:var(--acc);margin-bottom:12px">72°F</div><div style="font-size:24px;color:var(--txt2);margin-bottom:40px">Sunny</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:20px">${['Mon','Tue','Wed','Thu','Fri'].map((d,i)=>`<div style="background:var(--bg3);padding:20px;border-radius:14px;border:2px solid var(--border)"><div style="font-weight:700;margin-bottom:10px">${d}</div><div style="font-size:32px;margin:10px 0">${['☀️','⛅','🌤️','🌧️','⛈️'][i]}</div><div style="font-size:20px;color:var(--acc)">${[72,68,65,58,60][i]}°</div></div>`).join('')}</div></div></div>`});
+else if(id==='achievements')createWin('Achievements','🏆','achievements',c=>{c.innerHTML=`<div class="content-grid"><div style="margin-bottom:35px"><div class="grid-title">Achievement System</div><div class="grid-subtitle">${ACHIEVEMENTS_DATA.filter(a=>a.unlocked).length} of ${ACHIEVEMENTS_DATA.length} unlocked</div></div>${ACHIEVEMENTS_DATA.map(ach=>`<div class="achievement-badge ${ach.unlocked?'unlocked':'achievement-locked'}"><div class="achievement-icon">${ach.icon}</div><div class="achievement-info"><div class="achievement-name">${ach.name}</div><div class="achievement-desc">${ach.desc}</div></div>${ach.unlocked?'<div style="color:var(--acc);font-size:24px">✓</div>':'<div style="color:var(--txt2);font-size:24px">🔒</div>'}</div>`).join('')}</div>`;bindHover()});
+else if(id==='pet')togglePet();
+else if(id==='files')createWin('File Manager','📁','files',c=>{c.innerHTML=`<div class="content-grid"><div style="margin-bottom:35px"><div class="grid-title">File Manager</div><div class="grid-subtitle">Organize and manage your files</div></div><div style="padding:120px;text-align:center;color:var(--txt2)"><div style="font-size:90px;margin-bottom:28px;filter:drop-shadow(0 0 20px rgba(0,0,0,.6))">📁</div><div style="font-size:22px;font-weight:700;margin-bottom:14px">No Files Yet</div><div style="font-size:16px;line-height:1.6">File management features coming soon!</div></div></div>`});
+else if(id==='sysinfo')createWin('System Info','💻','sysinfo',c=>{const info={'Operating System':'Peak Hub Ultimate V2','Browser':navigator.userAgent.split(')')[0]+')','Language':navigator.language,'Platform':navigator.platform,'Online Status':navigator.onLine?'✓ Connected':'✗ Offline','Cookies':navigator.cookieEnabled?'✓ Enabled':'✗ Disabled','Screen Resolution':`${screen.width} × ${screen.height}`,'Color Depth':`${screen.colorDepth}-bit`,'Current Theme':settings.theme.charAt(0).toUpperCase()+settings.theme.slice(1),'Background Style':settings.bg.charAt(0).toUpperCase()+settings.bg.slice(1),'Apps Installed':INSTALLED.length,'Windows Open':windows.length,'Achievements Unlocked':ACHIEVEMENTS_DATA.filter(a=>a.unlocked).length,'Local Storage':Object.keys(localStorage).length+' items'};c.innerHTML=`<div class="content-grid"><div style="margin-bottom:35px"><div class="grid-title">System Information</div><div class="grid-subtitle">Detailed system statistics</div></div><div style="background:var(--bg3);padding:32px;border-radius:20px;font-family:'Fira Code',monospace;font-size:15px;border:2px solid var(--border-acc);box-shadow:0 10px 35px rgba(0,0,0,.5)">${Object.entries(info).map(([k,v])=>`<div style="margin-bottom:18px;display:flex;justify-content:space-between;padding-bottom:18px;border-bottom:2px solid var(--border)"><span style="color:var(--acc);font-weight:700;text-shadow:0 0 10px var(--glow)">${k}</span><span style="color:var(--txt);font-weight:600">${v}</span></div>`).join('')}</div></div>`});
+else if(id==='settings')createWin('Settings','⚙️','settings',c=>{c.innerHTML=`<div class="content-grid"><div style="margin-bottom:35px"><div class="grid-title">Settings</div><div class="grid-subtitle">Configure Peak Hub</div></div><div style="display:flex;flex-direction:column;gap:28px"><div style="background:var(--bg3);padding:32px;border-radius:20px;border:2px solid var(--border-acc);box-shadow:0 8px 28px rgba(0,0,0,.5)"><h3 style="font-size:20px;margin-bottom:24px;color:var(--acc);font-weight:700;text-shadow:0 0 15px var(--glow)">👤 User Account</h3><p style="font-size:16px;margin-bottom:10px">Username: <strong style="color:var(--acc)">${currentUser.username}</strong></p><p style="font-size:14px;color:var(--txt2);font-weight:600">Status: <span style="color:#10b981">● Active</span></p></div><div style="background:var(--bg3);padding:32px;border-radius:20px;border:2px solid var(--border-acc);box-shadow:0 8px 28px rgba(0,0,0,.5)"><h3 style="font-size:20px;margin-bottom:24px;color:var(--acc);font-weight:700;text-shadow:0 0 15px var(--glow)">💾 System Stats</h3><p style="font-size:16px;margin-bottom:14px">Apps: <strong style="color:var(--acc)">${INSTALLED.length}</strong></p><p style="font-size:16px;margin-bottom:14px">Achievements: <strong style="color:var(--acc)">${ACHIEVEMENTS_DATA.filter(a=>a.unlocked).length}/${ACHIEVEMENTS_DATA.length}</strong></p><p style="font-size:16px;margin-bottom:14px">Theme: <strong style="color:var(--acc)">${settings.theme}</strong></p><p style="font-size:16px">Sounds: <strong style="color:var(--acc)">${settings.soundsEnabled?'Enabled':'Disabled'}</strong></p></div><div style="background:var(--bg3);padding:32px;border-radius:20px;border:2px solid var(--border-acc);box-shadow:0 8px 28px rgba(0,0,0,.5)"><h3 style="font-size:20px;margin-bottom:24px;color:var(--acc);font-weight:700;text-shadow:0 0 15px var(--glow)">⚡ Actions</h3><button class="grid-btn danger" style="width:100%;margin-bottom:14px" onclick="if(confirm('Reset all data?')){localStorage.clear();location.reload()}">🔄 Reset All</button><button class="grid-btn" style="width:100%" onclick="window.logout()">🔓 Logout</button></div></div></div>`;bindHover()});
+else if(id==='terminal')createWin('Terminal','⌨️','terminal',c=>{c.innerHTML=`<div style="height:100%;display:flex;flex-direction:column;background:#000;padding:20px;font-family:'Fira Code',monospace"><div id="terminal-output" style="flex:1;overflow-y:auto;color:#0f0;font-size:14px;line-height:1.6"></div><div style="display:flex;gap:10px;margin-top:10px"><span style="color:#0f0">$</span><input type="text" id="terminal-input" placeholder="Type 'help' for commands..." style="flex:1;background:transparent;border:none;color:#0f0;font-family:'Fira Code',monospace;font-size:14px;outline:none"></div></div>`;const output=$('#terminal-output');const input=$('#terminal-input');const commands={'help':'Available commands: help, clear, date, sysinfo, ls, install <app>, uninstall <app>, theme <name>, neofetch, echo <text>','clear':'','date':new Date().toString(),'sysinfo':`Peak Hub v2.0\\nUser: ${currentUser.username}\\nApps: ${INSTALLED.length}\\nTheme: ${settings.theme}\\nAchievements: ${ACHIEVEMENTS_DATA.filter(a=>a.unlocked).length}/${ACHIEVEMENTS_DATA.length}`,'ls':INSTALLED.map(a=>`${a.icon} ${a.name}`).join('\\n'),'neofetch':`     _____           \\n    |  __ \\         \\n    | |__) |__  __ _ ___  ___\\n    |  ___/ _ \\/ _\` | / __/ __|\\n    | |  |  __/ (_| | \\__ \\__ \\\\n    |_|   \\___|\\__,_|_|___/___/\\n    \\n    OS: Peak Hub Ultimate V2\\n    User: ${currentUser.username}\\n    Theme: ${settings.theme}\\n    Apps: ${INSTALLED.length}\\n    Uptime: ${Math.floor(performance.now()/1000)}s`};output.innerHTML='<div>Peak Hub Terminal v2.0</div><div>Type "help" for commands</div><div>---</div>';input.addEventListener('keypress',e=>{if(e.key==='Enter'){const cmd=input.value.trim();output.innerHTML+=`<div style="margin-top:10px">$ ${cmd}</div>`;if(cmd==='clear')output.innerHTML='';else if(cmd.startsWith('echo '))output.innerHTML+=`<div>${cmd.substring(5)}</div>`;else if(cmd.startsWith('install ')){const appName=cmd.substring(8);const app=GAMES.find(g=>g.name.toLowerCase().includes(appName.toLowerCase()))||TOOLS.find(t=>t.name.toLowerCase().includes(appName.toLowerCase()));if(app&&!INSTALLED.find(i=>i.id===app.id)){INSTALLED.push({...app,type:app.url?'game':'tool'});saveData('installed',INSTALLED);output.innerHTML+=`<div style="color:#0f0">✓ Installed: ${app.name}</div>`;renderDesktop();updateWidgets()}else output.innerHTML+=`<div style="color:#f00">✗ App not found or already installed</div>`}else if(cmd.startsWith('uninstall ')){const appName=cmd.substring(10);const app=INSTALLED.find(a=>a.name.toLowerCase().includes(appName.toLowerCase()));if(app&&!app.protected){INSTALLED=INSTALLED.filter(a=>a.id!==app.id);saveData('installed',INSTALLED);output.innerHTML+=`<div style="color:#0f0">✓ Uninstalled: ${app.name}</div>`;renderDesktop();updateWidgets()}else output.innerHTML+=`<div style="color:#f00">✗ App not found or protected</div>`}else if(cmd.startsWith('theme ')){const theme=cmd.substring(6);if(['midnight','neon','aurora','sunset','cyber','matrix','retro'].includes(theme)){settings.theme=theme;applySettings();output.innerHTML+=`<div style="color:#0f0">✓ Theme changed to: ${theme}</div>`}else output.innerHTML+=`<div style="color:#f00">✗ Invalid theme. Try: midnight, neon, aurora, sunset, cyber, matrix, retro</div>`}else output.innerHTML+=`<div>${commands[cmd]||'Command not found: '+cmd}</div>`;input.value='';output.scrollTop=output.scrollHeight}})});
+else if(id==='paint')createWin('Paint','🎨','paint',c=>{c.innerHTML=`<div style="height:100%;display:flex;flex-direction:column"><div style="padding:14px;background:var(--bg3);border-bottom:2px solid var(--border-acc);display:flex;gap:10px"><input type="color" id="paint-color" value="#00d4ff" style="width:50px;height:40px;border:none;border-radius:8px;cursor:pointer"><button class="grid-btn" onclick="document.getElementById('paint-canvas').getContext('2d').clearRect(0,0,9999,9999)">Clear</button><input type="range" id="paint-size" min="1" max="50" value="5" style="width:150px"></div><canvas id="paint-canvas" style="flex:1;background:#fff;cursor:crosshair"></canvas></div>`;const canvas=$('#paint-canvas');const ctx=canvas.getContext('2d');canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;let painting=false;canvas.addEventListener('mousedown',()=>painting=true);canvas.addEventListener('mouseup',()=>painting=false);canvas.addEventListener('mousemove',e=>{if(!painting)return;const rect=canvas.getBoundingClientRect();const x=e.clientX-rect.left;const y=e.clientY-rect.top;ctx.fillStyle=$('#paint-color').value;ctx.beginPath();ctx.arc(x,y,$('#paint-size').value,0,Math.PI*2);ctx.fill()})});
 };
 
-// SCRAMJET PROXY LOADER (Ultraviolet)
-window.loadProxyUrl=(reload=false)=>{
-const frame=$('#proxy-frame');
-const urlInput=$('#proxy-url');
-if(!frame||!urlInput)return;
-if(reload){frame.src=frame.src;return}
-let url=urlInput.value.trim();
-if(!url)return;
-if(!url.includes('://')){
-if(url.includes('.')){
-url='https://'+url;
-}else{
-url='https://www.google.com/search?q='+encodeURIComponent(url);
-}
-}
-const proxyUrl='https://uv.lucavm.workers.dev/'+encodeURIComponent(url);
-frame.src=proxyUrl;
-};
-
+// HELPER FUNCTIONS
+window.loadProxyUrl=(reload=false)=>{const frame=$('#proxy-frame');const urlInput=$('#proxy-url');if(!frame||!urlInput)return;if(reload){frame.src=frame.src;return}let url=urlInput.value.trim();if(!url)return;if(!url.includes('://')){if(url.includes('.')){url='https://'+url}else{url='https://www.google.com/search?q='+encodeURIComponent(url)}}const proxyUrl='https://uv.lucavm.workers.dev/'+encodeURIComponent(url);frame.src=proxyUrl};
 let calcVal='0',calcOp=null,calcPrev=null;
-window.calcBtn=b=>{
-const disp=$('#calc-display');
-if(!disp)return;
-if(b==='C'){calcVal='0';calcOp=null;calcPrev=null}
-else if(b==='←'){calcVal=calcVal.slice(0,-1)||'0'}
-else if(['+','-','×','÷','%'].includes(b)){calcOp=b;calcPrev=parseFloat(calcVal);calcVal='0'}
-else if(b==='='){
-if(calcOp&&calcPrev!==null){
-const cur=parseFloat(calcVal);
-let res=0;
-if(calcOp==='+')res=calcPrev+cur;
-else if(calcOp==='-')res=calcPrev-cur;
-else if(calcOp==='×')res=calcPrev*cur;
-else if(calcOp==='÷')res=calcPrev/cur;
-else if(calcOp==='%')res=calcPrev%cur;
-calcVal=res.toString();
-calcOp=null;
-calcPrev=null;
-}
-}else{
-if(calcVal==='0'&&b!=='.')calcVal=b;
-else calcVal+=b;
-}
-disp.textContent=calcVal;
-};
-
+window.calcBtn=b=>{const disp=$('#calc-display');if(!disp)return;if(b==='C'){calcVal='0';calcOp=null;calcPrev=null}else if(b==='←'){calcVal=calcVal.slice(0,-1)||'0'}else if(['+','-','×','÷','%'].includes(b)){calcOp=b;calcPrev=parseFloat(calcVal);calcVal='0'}else if(b==='='){if(calcOp&&calcPrev!==null){const cur=parseFloat(calcVal);let res=0;if(calcOp==='+')res=calcPrev+cur;else if(calcOp==='-')res=calcPrev-cur;else if(calcOp==='×')res=calcPrev*cur;else if(calcOp==='÷')res=calcPrev/cur;else if(calcOp==='%')res=calcPrev%cur;calcVal=res.toString();calcOp=null;calcPrev=null}}else{if(calcVal==='0'&&b!=='.')calcVal=b;else calcVal+=b}disp.textContent=calcVal};
 let curNoteIdx=null;
 window.createNote=()=>{curNoteIdx=null;$('#note-title').value='';$('#note-content').value='';$('#note-title').focus()};
 window.loadNote=i=>{const notes=loadData('notes',[]);curNoteIdx=i;$('#note-title').value=notes[i].title;$('#note-content').value=notes[i].content};
-window.saveNote=()=>{
-const notes=loadData('notes',[]);
-const title=$('#note-title').value.trim()||'Untitled Note';
-const content=$('#note-content').value.trim();
-if(!content){toast('Cannot Save! ⚠️','Note content is empty','error');return}
-const note={title,content,date:new Date().toISOString()};
-if(curNoteIdx!==null)notes[curNoteIdx]=note;
-else notes.push(note);
-saveData('notes',notes);
-toast('Note Saved! 📝',`"${title}" has been saved successfully`);
-const notesList=$('#notes-list');
-if(notesList){notesList.innerHTML=notes.map((n,i)=>`<div class="item-card" style="padding:18px;cursor:pointer" onclick="loadNote(${i})"><div style="font-size:15px;font-weight:700;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${n.title||'Untitled Note'}</div><div style="font-size:12px;color:var(--txt2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${n.content.substring(0,60)}...</div></div>`).join('');bindHover()}
-};
-
-window.changeTheme=t=>{settings.theme=t;applySettings();toast('Theme Changed! 🎨',`Now using ${t.charAt(0).toUpperCase()+t.slice(1)} theme`)};
-window.changeBg=b=>{settings.bg=b;applySettings();toast('Background Changed! 🖼️',`Now using ${b.charAt(0).toUpperCase()+b.slice(1)} background`)};
-window.changeCursor=c=>{settings.cursor=c;applySettings();toast('Cursor Updated! 🖱️','Cursor color has been changed')};
-
-window.logout=()=>{if(confirm('⚠️ Logout from Peak Hub?')){saveData('currentUser',null);location.reload()}};
+window.saveNote=()=>{const notes=loadData('notes',[]);const title=$('#note-title').value.trim()||'Untitled Note';const content=$('#note-content').value.trim();if(!content){toast('Cannot Save! ⚠️','Note content is empty','error');return}const note={title,content,date:new Date().toISOString()};if(curNoteIdx!==null)notes[curNoteIdx]=note;else notes.push(note);saveData('notes',notes);toast('Note Saved! 📝',`"${title}" saved`);const notesList=$('#notes-list');if(notesList){notesList.innerHTML=notes.map((n,i)=>`<div class="item-card" style="padding:18px;cursor:pointer" onclick="loadNote(${i})"><div style="font-size:15px;font-weight:700;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${n.title||'Untitled Note'}</div><div style="font-size:12px;color:var(--txt2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${n.content.substring(0,60)}...</div></div>`).join('');bindHover()}};
+window.addEvent=(dateKey)=>{const title=prompt('Event title:');if(title){CALENDAR_EVENTS[dateKey]=title;saveData('events',CALENDAR_EVENTS);toast('Event Added! 📅',title);openTool('calendar')}};
+window.addTodo=()=>{const input=$('#new-todo');const text=input.value.trim();if(!text)return;TODO_LIST.push({id:Date.now(),text,completed:false,date:new Date().toISOString()});saveData('todos',TODO_LIST);input.value='';$('#todo-list').innerHTML=renderTodos();toast('Task Added! ✓',text);bindHover();updateWidgets()};
+window.toggleTodo=id=>{const todo=TODO_LIST.find(t=>t.id===id);if(todo){todo.completed=!todo.completed;saveData('todos',TODO_LIST);$('#todo-list').innerHTML=renderTodos();updateWidgets();bindHover()}};
+window.deleteTodo=id=>{TODO_LIST=TODO_LIST.filter(t=>t.id!==id);saveData('todos',TODO_LIST);$('#todo-list').innerHTML=renderTodos();updateWidgets();bindHover()};
+function renderTodos(){return TODO_LIST.map(t=>`<div class="todo-item"><div class="todo-checkbox ${t.completed?'checked':''}" onclick="toggleTodo(${t.id})">${t.completed?'✓':''}</div><div class="todo-text ${t.completed?'completed':''}">${t.text}</div><button class="grid-btn danger" onclick="deleteTodo(${t.id})">🗑️</button></div>`).join('')}
+let pomoTimer=null,pomoSeconds=25*60,pomoRunning=false;
+window.startPomodoro=()=>{if(pomoRunning)return;pomoRunning=true;pomoTimer=setInterval(()=>{pomoSeconds--;if(pomoSeconds<=0){clearInterval(pomoTimer);pomoRunning=false;pomoSeconds=5*60;POMODORO_COUNT++;saveData('pomodoro-count',POMODORO_COUNT);toast('Session Complete! ⏱️','Take a 5-minute break','achievement');playSound('achievement');updateWidgets()}const disp=$('#pomo-display');if(disp)disp.textContent=Math.floor(pomoSeconds/60)+':'+String(pomoSeconds%60).padStart(2,'0')},1000)};
+window.resetPomodoro=()=>{clearInterval(pomoTimer);pomoRunning=false;pomoSeconds=25*60;const disp=$('#pomo-display');if(disp)disp.textContent='25:00'};
+window.skipPomodoro=()=>{clearInterval(pomoTimer);pomoRunning=false;pomoSeconds=5*60;const disp=$('#pomo-display');if(disp)disp.textContent='5:00'};
+window.takeScreenshot=()=>{toast('Capturing... 📸','Taking screenshot');setTimeout(()=>{html2canvas(document.body).then(canvas=>{const link=document.createElement('a');link.download=`peak-hub-${Date.now()}.png`;link.href=canvas.toDataURL();link.click();SCREENSHOT_COUNT++;saveData('screenshot-count',SCREENSHOT_COUNT);updateWidgets();toast('Screenshot Saved! 📸','Downloaded successfully');canvas.toBlob(blob=>navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).catch(()=>{}))})},100)};
+window.addBookmark=()=>{const url=$('#bookmark-url').value.trim();const name=$('#bookmark-name').value.trim()||url;if(!url)return;BOOKMARKS.push({id:Date.now(),url,name});saveData('bookmarks',BOOKMARKS);$('#bookmark-url').value='';$('#bookmark-name').value='';$('#bookmarks-list').innerHTML=renderBookmarks();toast('Bookmark Saved! 🔖',name);bindHover()};
+window.deleteBookmark=id=>{BOOKMARKS=BOOKMARKS.filter(b=>b.id!==id);saveData('bookmarks',BOOKMARKS);$('#bookmarks-list').innerHTML=renderBookmarks();bindHover()};
+window.openBookmark=url=>{openTool('browser');setTimeout(()=>{const urlInput=$('#proxy-url');if(urlInput){urlInput.value=url;loadProxyUrl()}},500)};
+function renderBookmarks(){return BOOKMARKS.map(b=>`<div class="item-card"><div class="item-header"><div class="item-icon">🔖</div><div style="flex:1"><div class="item-name">${b.name}</div><div class="item-desc">${b.url}</div></div></div><div class="item-actions"><button class="grid-btn primary" onclick="openBookmark('${b.url}')">🌐 Open</button><button class="grid-btn danger" onclick="deleteBookmark(${b.id})">🗑️</button></div></div>`).join('')}
+window.togglePet=()=>{const pet=$('#pet-container');if(pet.style.display==='none'){pet.style.display='block';toast('Pet Enabled! 🐱','Your companion is here')}else{pet.style.display='none';toast('Pet Hidden! 🐱','Companion dismissed')}};
+window.changeTheme=t=>{settings.theme=t;applySettings();toast('Theme Changed! 🎨',`Now using ${t}`)};
+window.changeBg=b=>{settings.bg=b;settings.customBg=null;applySettings();toast('Background Changed! 🖼️',`Now using ${b}`)};
+window.changeCursor=c=>{settings.cursor=c;applySettings();toast('Cursor Updated! 🖱️','Color changed')};
+window.logout=()=>{if(confirm('Logout from Peak Hub?')){saveData('currentUser',null);location.reload()}};
 
 document.addEventListener('DOMContentLoaded',()=>{
 const ls=$('#loading-screen'),lp=$('#loading-progress'),lst=$('#loading-stats');
-const steps=[
-{t:"Initializing core systems...",p:15},
-{t:"Loading game library...",p:30},
-{t:"Configuring proxy network...",p:45},
-{t:"Setting up tools...",p:60},
-{t:"Preparing desktop environment...",p:75},
-{t:"Finalizing components...",p:90},
-{t:"System ready!",p:100}
-];
+const steps=[{t:"Initializing core systems...",p:15},{t:"Loading game library...",p:30},{t:"Configuring proxy network...",p:45},{t:"Setting up tools...",p:60},{t:"Preparing desktop...",p:75},{t:"Finalizing...",p:90},{t:"System ready!",p:100}];
 let s=0;
-function upd(){
-if(s>=steps.length){
-setTimeout(()=>ls.classList.add('hidden'),700);
-return;
-}
-lp.style.width=steps[s].p+'%';
-lst.textContent=steps[s].t;
-s++;
-setTimeout(upd,550);
-}
+function upd(){if(s>=steps.length){setTimeout(()=>ls.classList.add('hidden'),700);return}lp.style.width=steps[s].p+'%';lst.textContent=steps[s].t;s++;setTimeout(upd,550)}
 setTimeout(upd,1200);
-setTimeout(()=>{
-const u=loadData('currentUser');
-if(u&&u.username){
-currentUser=u;
-$('#login-screen').style.display='none';
-document.body.classList.add('logged-in');
-initDesktop();
-}else{
-initAuth();
-}
-},4500);
+setTimeout(()=>{const u=loadData('currentUser');if(u&&u.username){currentUser=u;$('#login-screen').style.display='none';document.body.classList.add('logged-in');initDesktop()}else{initAuth()}},4500);
 });
 </script>
 </body>
